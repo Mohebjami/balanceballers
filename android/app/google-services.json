@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "519364797751",
+    "project_id": "balance-baller",
+    "storage_bucket": "balance-baller.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519364797751:android:7254a10f54f41e136566b2",
+        "android_client_info": {
+          "package_name": "com.balanceballers.balanceballers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4Xh5MxxKteHcSRS6ZE3Xp1qdTHBye6Qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
