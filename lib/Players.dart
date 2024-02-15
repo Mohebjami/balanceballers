@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -11,9 +12,11 @@ class _PlayerListState extends State<PlayerList> {
   final CollectionReference playersRef =
   FirebaseFirestore.instance.collection('players');
   final CollectionReference debtorsRef =
-  FirebaseFirestore.instance.collection('Deptors');
+  FirebaseFirestore.instance.collection('Debtors');
   String searchString = '';
+
   final TextEditingController _searchController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +30,16 @@ class _PlayerListState extends State<PlayerList> {
             });
           },
           decoration: InputDecoration(
-              hintText: "Search...",
-              icon: IconButton(onPressed: (){
+            hintText: "Search...",
+            icon: IconButton(
+              onPressed: () {
                 setState(() {
                   _searchController.clear();
                   searchString = '';
                 });
-              }, icon: Icon(Icons.clear_sharp ,color: Colors.white,))
+              },
+              icon: Icon(Icons.clear_sharp, color: Colors.white),
+            ),
           ),
         ),
       ),
@@ -53,7 +59,8 @@ class _PlayerListState extends State<PlayerList> {
           }
           return ListView(
             children: snapshot.data?.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =  document.data() as Map<String, dynamic>;
+              Map<String, dynamic> data =
+              document.data() as Map<String, dynamic>;
               var date = data['Date'];
               String dateString = '';
               if (date is List) {
@@ -77,24 +84,17 @@ class _PlayerListState extends State<PlayerList> {
                                 (Transaction myTransaction) async {
                               await myTransaction.delete(document.reference);
                             });
-                        // Also delete from 'Deptors' collection
-                        var debtorsSnapshot = await debtorsRef
-                            .where('Name', isEqualTo: data['Name'])
-                            .limit(1)
-                            .get();
-                        if (debtorsSnapshot.docs.length > 0) {
-                          await debtorsSnapshot.docs.first.reference.delete();
-                        }
                       },
                     ),
                   ],
                 ),
                 child: ListTile(
                   title: Text(data['Name']),
-                  leading: Text(data['Last Name']),
-                  subtitle: Text(dateString), // Changed 'Fee' to 'Date'
+                  leading: CircleAvatar(
+                    child: Text(data['End Date'].toString()),
+                  ),
+                  subtitle: Text(dateString),
                   trailing: Text(data['Debt']),
-                  // Add other fields as needed
                 ),
               );
             }).toList() ??

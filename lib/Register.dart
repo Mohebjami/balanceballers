@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,6 +38,7 @@ class _RegisterState extends State<Register> {
     double fullScreenHeight = MediaQuery.of(context).size.height;
     double fullScreenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      // backgroundColor: _isLightTheme ? const Color.fromRGBO(255, 255, 240, 1) : const Color.fromRGBO(10, 23, 42,1),
       body: SizedBox(
         height: fullScreenHeight,
         width: fullScreenWidth,
@@ -71,6 +74,7 @@ class _RegisterState extends State<Register> {
                   border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
                   hintText: "Period",
                 ),
+                keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: debtorController,
@@ -112,7 +116,19 @@ class _RegisterState extends State<Register> {
       _selectedDate?.day
     ];
 
-    if (debtorController.text.isEmpty) {
+    int proid = int.parse(periodController.text);
+    DateTime? endDate = _selectedDate?.add(Duration(days: proid * 30));
+    print('The proid will end on: ${endDate.toString()}');
+
+    Timer(Duration(days: proid * 30), () {
+      print('Alert to admin: This player time is finished. He should be updated again.');
+    });
+
+    int remainingDays = endDate!.difference(DateTime.now()).inDays;
+    print("$remainingDays");
+
+
+    if (debtorController.text == "0" ||  debtorController.text.isEmpty ) {
       try {
         CollectionReference collRef =
             FirebaseFirestore.instance.collection('players');
@@ -124,6 +140,7 @@ class _RegisterState extends State<Register> {
           'Period': periodController.text,
           'Debt': debtorController.text, // Use the modified debtValue here
           'Date': selDate,
+          'End Date': remainingDays,
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -153,6 +170,31 @@ class _RegisterState extends State<Register> {
           'Period': periodController.text,
           'Debt': debtorController.text, // Use the modified debtValue here
           'Date': selDate,
+          'End Date':  remainingDays,
+        }).then((value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successful inserted'),
+            ),
+          );
+        }).catchError((error) {
+          print("Failed to add user: $error");
+        });
+      } catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to add user'),
+          ),
+        );
+      }
+      try {
+        CollectionReference collRef =
+        FirebaseFirestore.instance.collection('Debtors');
+
+        await collRef.add({
+          'Name': nameController.text,
+          'Last Name': lastController.text,
+          'Debt': debtorController.text, // Use the modified debtValue here
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -171,36 +213,13 @@ class _RegisterState extends State<Register> {
       }
     }
 
-    try {
-      CollectionReference collRef =
-          FirebaseFirestore.instance.collection('Deptors');
 
-      await collRef.add({
-        'Name': nameController.text,
-        'Last Name': lastController.text,
-        'Debt': debtorController.text, // Use the modified debtValue here
-      }).then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Successful inserted'),
-          ),
-        );
-      }).catchError((error) {
-        print("Failed to add user: $error");
-      });
-    } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to add user'),
-        ),
-      );
-    }
 
-    debtorController.clear();
-    lastController.clear();
-    nameController.clear();
-    periodController.clear();
-    debtorController.clear();
-    feeController.clear();
+    // debtorController.clear();
+    // lastController.clear();
+    // nameController.clear();
+    // periodController.clear();
+    // debtorController.clear();
+    // feeController.clear();
   }
 }

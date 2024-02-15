@@ -30,7 +30,7 @@ class _StartState extends State<Start> {
     double fullScreenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: _isLightTheme ? Color.fromRGBO(255, 255, 240, 1) : Color.fromRGBO(10, 23, 42,1),
+      backgroundColor: _isLightTheme ? const Color.fromRGBO(10, 23, 42,1) : const Color.fromRGBO(255, 255, 240, 1),
       appBar: AppBar(
         title: Builder(
           builder: (context) => GestureDetector(
@@ -55,12 +55,12 @@ class _StartState extends State<Start> {
                     widget.toggleTheme();
                   });
                 },
-                activeColor: Colors.yellow,
-                inactiveThumbColor: Colors.blueGrey,
-                inactiveTrackColor: Colors.grey,
-                activeTrackColor: Colors.orange,
-                activeThumbImage: const AssetImage('assets/pic/sun.png'),
-                inactiveThumbImage: const AssetImage('assets/pic/moon.png'),
+                activeColor: Colors.blueGrey,
+                inactiveThumbColor: Colors.yellow,
+                inactiveTrackColor: Colors.orange,
+                activeTrackColor: Colors.grey,
+                inactiveThumbImage: const AssetImage('assets/pic/sun.png'),
+                activeThumbImage: const AssetImage('assets/pic/moon.png'),
               ),
             ),
           ),
@@ -77,7 +77,7 @@ class _StartState extends State<Start> {
             children: [
                Text(
                 "Herat Futsal Club ",
-                style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla",color: _isLightTheme ? const Color.fromRGBO(0, 0, 0, 1) : Color.fromRGBO(255, 255, 255, 1),),
+                style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
               ),
               const SizedBox(
                 height: 60,
@@ -85,7 +85,7 @@ class _StartState extends State<Start> {
                Center(
                 child: Container(
                   height: 200,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(image: AssetImage("assets/pic/Ball.png"),fit: BoxFit.contain)
                   ),
                  
@@ -114,7 +114,7 @@ class _StartState extends State<Start> {
                             },
                             child: const Text("Register" , style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       SizedBox(
@@ -131,7 +131,7 @@ class _StartState extends State<Start> {
                             },
                             child: const Text("Players", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       SizedBox(
