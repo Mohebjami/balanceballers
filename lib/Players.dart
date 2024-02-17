@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:balanceballers/PlayerInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -10,13 +11,43 @@ class PlayerList extends StatefulWidget {
 
 class _PlayerListState extends State<PlayerList> {
   final CollectionReference playersRef =
-  FirebaseFirestore.instance.collection('players');
+      FirebaseFirestore.instance.collection('players');
   final CollectionReference debtorsRef =
-  FirebaseFirestore.instance.collection('Debtors');
+      FirebaseFirestore.instance.collection('Debtors');
   String searchString = '';
+  Timer? _dailyTimer;
 
   final TextEditingController _searchController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _startDailyTimer();
+  }
+
+  @override
+  void dispose() {
+    _dailyTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startDailyTimer() {
+    _dailyTimer = Timer.periodic(Duration(days: 1), (timer) async {
+      QuerySnapshot snapshot = await playersRef.get();
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        DateTime endDate = DateTime.parse(data['End Date']);
+        int remainingDays = endDate.difference(DateTime.now()).inDays;
+        if (remainingDays > 0) {
+          doc.reference.update(
+              {'remainingDays': remainingDays}); // Update 'remainingDays' field
+        } else {
+          await debtorsRef.add(data);
+          await doc.reference.delete();
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,29 +78,24 @@ class _PlayerListState extends State<PlayerList> {
         stream: (searchString == null || searchString.trim() == '')
             ? playersRef.snapshots()
             : playersRef
-            .where('Name', isGreaterThanOrEqualTo: searchString)
-            .snapshots(),
+                .where('Name', isGreaterThanOrEqualTo: searchString)
+                .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Something went wrong');
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading");
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
           return ListView(
             children: snapshot.data?.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-              document.data() as Map<String, dynamic>;
-              var date = data['Date'];
-              String dateString = '';
-              if (date is List) {
-                dateString = date.join(',') != 'null,null,null'
-                    ? date.join(',')
-                    : '';
-              } else {
-                dateString = date != 'null,null,null' ? date : '';
-              }
+              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+              DateTime endDate = DateTime.parse(data['End Date']);
+              int remainingDays = endDate.difference(DateTime.now()).inDays;
+
               return Slidable(
                 closeOnScroll: true,
                 startActionPane: ActionPane(
@@ -91,15 +117,26 @@ class _PlayerListState extends State<PlayerList> {
                 child: ListTile(
                   title: Text(data['Name']),
                   leading: CircleAvatar(
-                    child: Text(data['End Date'].toString()),
+                    backgroundColor: remainingDays > 5 ? Colors.green : (remainingDays >= 0 ? Colors.yellow : Colors.red),// Change color if remainingDays <= 5
+                    child: Text(remainingDays.toString()),
+
                   ),
-                  subtitle: Text(dateString),
+                  subtitle: Text(data['Last Name']),
                   trailing: Text(data['Debt']),
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PlayerInfo(data: data),
+                      ),
+                    );
+                  },
                 ),
               );
             }).toList() ??
                 [],
           );
+
         },
       ),
     );

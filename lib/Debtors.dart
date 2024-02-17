@@ -9,7 +9,7 @@ class Debtors extends StatefulWidget {
 
 class _DebtorsState extends State<Debtors> {
   final CollectionReference collectionRef =
-      FirebaseFirestore.instance.collection('Deptors');
+      FirebaseFirestore.instance.collection('Debtors');
   String searchString = '';
 
   @override
@@ -22,7 +22,7 @@ class _DebtorsState extends State<Debtors> {
               searchString = value.toLowerCase();
             });
           },
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: "Search...",
           ),
         ),
@@ -35,11 +35,11 @@ class _DebtorsState extends State<Debtors> {
                 .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text('Something went wrong');
+            return const Text('Something went wrong');
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading");
+            return const Text("Loading");
           }
           return ListView(
             children: snapshot.data?.docs.map((DocumentSnapshot document) {

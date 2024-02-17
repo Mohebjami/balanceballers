@@ -120,13 +120,6 @@ class _RegisterState extends State<Register> {
     DateTime? endDate = _selectedDate?.add(Duration(days: proid * 30));
     print('The proid will end on: ${endDate.toString()}');
 
-    Timer(Duration(days: proid * 30), () {
-      print('Alert to admin: This player time is finished. He should be updated again.');
-    });
-
-    int remainingDays = endDate!.difference(DateTime.now()).inDays;
-    print("$remainingDays");
-
 
     if (debtorController.text == "0" ||  debtorController.text.isEmpty ) {
       try {
@@ -140,7 +133,7 @@ class _RegisterState extends State<Register> {
           'Period': periodController.text,
           'Debt': debtorController.text, // Use the modified debtValue here
           'Date': selDate,
-          'End Date': remainingDays,
+          'End Date': endDate.toString(),
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -170,7 +163,7 @@ class _RegisterState extends State<Register> {
           'Period': periodController.text,
           'Debt': debtorController.text, // Use the modified debtValue here
           'Date': selDate,
-          'End Date':  remainingDays,
+          'End Date':  endDate.toString(),
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

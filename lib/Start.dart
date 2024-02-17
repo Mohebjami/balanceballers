@@ -75,8 +75,8 @@ class _StartState extends State<Start> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-               Text(
-                "Herat Futsal Club ",
+               const Text(
+                "Mottahid futsal academy",
                 style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
               ),
               const SizedBox(
@@ -86,7 +86,7 @@ class _StartState extends State<Start> {
                 child: Container(
                   height: 200,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(image: AssetImage("assets/pic/Ball.png"),fit: BoxFit.contain)
+                    image: DecorationImage(image: AssetImage("assets/pic/logo.png"),fit: BoxFit.contain)
                   ),
                  
                 ),
@@ -147,6 +147,23 @@ class _StartState extends State<Start> {
                               );
                             },
                             child: const Text("Debtors", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                            style: const ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                                    Color.fromRGBO(255, 180, 0, 1))),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Debtors()),
+                              );
+                            },
+                            child: const Text("Free Player", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
                       ),
                     ],
                   ),

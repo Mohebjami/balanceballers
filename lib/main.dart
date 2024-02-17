@@ -2,8 +2,7 @@ import 'package:balanceballers/Register.dart';
 import 'package:balanceballers/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:balanceballers/Start.dart'; // Import the Start class from start.dart
-
+import 'package:balanceballers/Start.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
