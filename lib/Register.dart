@@ -16,7 +16,7 @@ class _RegisterState extends State<Register> {
   TextEditingController feeController = TextEditingController();
   TextEditingController periodController = TextEditingController();
   TextEditingController debtorController = TextEditingController();
-
+  String dropdownValue = 'Week';
   DateTime? _selectedDate;
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -25,7 +25,6 @@ class _RegisterState extends State<Register> {
       firstDate: DateTime(2024, 1),
       lastDate: DateTime(2050),
     );
-
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -38,14 +37,17 @@ class _RegisterState extends State<Register> {
     double fullScreenHeight = MediaQuery.of(context).size.height;
     double fullScreenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      // backgroundColor: _isLightTheme ? const Color.fromRGBO(255, 255, 240, 1) : const Color.fromRGBO(10, 23, 42,1),
-      body: SizedBox(
+// backgroundColor: _isLightTheme ? const Color.fromRGBO(255, 255, 240, 1) : const Color.fromRGBO(10, 23, 42,1),
+      body: Container(
         height: fullScreenHeight,
         width: fullScreenWidth,
+        decoration: BoxDecoration(
+          image: DecorationImage(image: AssetImage("assets/pic/backgroundR.jpg"),fit: BoxFit.cover)
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextField(
                 controller: nameController,
@@ -54,6 +56,9 @@ class _RegisterState extends State<Register> {
                   hintText: "Name",
                 ),
               ),
+              SizedBox(
+                height: 5,
+              ),
               TextField(
                 controller: lastController,
                 decoration: const InputDecoration(
@@ -61,12 +66,55 @@ class _RegisterState extends State<Register> {
                   hintText: "Last Name",
                 ),
               ),
+              SizedBox(
+                height: 5,
+              ),
               TextField(
                 controller: feeController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
                   hintText: "Fee",
                 ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Container(
+                width: fullScreenWidth,
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  border: Border.all(
+                    color: Colors.grey,
+                    style: BorderStyle.solid,
+                    width: 2.0,
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.white),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownValue = newValue!;
+                      });
+                    },
+                    items: <String>['Week', 'Month']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 5,
               ),
               TextField(
                 controller: periodController,
@@ -76,6 +124,9 @@ class _RegisterState extends State<Register> {
                 ),
                 keyboardType: TextInputType.number,
               ),
+              SizedBox(
+                height: 5,
+              ),
               TextField(
                 controller: debtorController,
                 decoration: const InputDecoration(
@@ -83,6 +134,9 @@ class _RegisterState extends State<Register> {
                   hintText: "Debtors",
                 ),
                 keyboardType: TextInputType.number,
+              ),
+              SizedBox(
+                height: 5,
               ),
               SizedBox(
                 width: fullScreenWidth,
@@ -115,17 +169,14 @@ class _RegisterState extends State<Register> {
       _selectedDate?.month,
       _selectedDate?.day
     ];
-
     int proid = int.parse(periodController.text);
-    DateTime? endDate = _selectedDate?.add(Duration(days: proid * 30));
+    proid = dropdownValue == 'Week' ? proid * 7 : proid * 30;
+    DateTime? endDate = _selectedDate?.add(Duration(days: proid));
     print('The proid will end on: ${endDate.toString()}');
-
-
-    if (debtorController.text == "0" ||  debtorController.text.isEmpty ) {
+    if (debtorController.text == "0" || debtorController.text.isEmpty) {
       try {
         CollectionReference collRef =
             FirebaseFirestore.instance.collection('players');
-
         await collRef.add({
           'Name': nameController.text,
           'Last Name': lastController.text,
@@ -150,12 +201,10 @@ class _RegisterState extends State<Register> {
           ),
         );
       }
-    }
-    else if (debtorController.text.isNotEmpty) {
+    } else if (debtorController.text.isNotEmpty) {
       try {
         CollectionReference collRef =
             FirebaseFirestore.instance.collection('players');
-
         await collRef.add({
           'Name': nameController.text,
           'Last Name': lastController.text,
@@ -163,7 +212,7 @@ class _RegisterState extends State<Register> {
           'Period': periodController.text,
           'Debt': debtorController.text, // Use the modified debtValue here
           'Date': selDate,
-          'End Date':  endDate.toString(),
+          'End Date': endDate.toString(),
         }).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -182,8 +231,7 @@ class _RegisterState extends State<Register> {
       }
       try {
         CollectionReference collRef =
-        FirebaseFirestore.instance.collection('Debtors');
-
+            FirebaseFirestore.instance.collection('Debtors');
         await collRef.add({
           'Name': nameController.text,
           'Last Name': lastController.text,
@@ -205,14 +253,5 @@ class _RegisterState extends State<Register> {
         );
       }
     }
-
-
-
-    // debtorController.clear();
-    // lastController.clear();
-    // nameController.clear();
-    // periodController.clear();
-    // debtorController.clear();
-    // feeController.clear();
   }
 }

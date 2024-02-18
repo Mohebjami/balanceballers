@@ -1,4 +1,5 @@
 import 'package:balanceballers/Debtors.dart';
+import 'package:balanceballers/Free_Player.dart';
 import 'package:balanceballers/Players.dart';
 import 'package:balanceballers/Register.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +18,12 @@ class _StartState extends State<Start> {
 
   bool get isLightTheme => _isLightTheme; // Getter for _isLightTheme
 
-  set isLightTheme(bool value) { // Setter for _isLightTheme
+  set isLightTheme(bool value) {
+    // Setter for _isLightTheme
     setState(() {
       _isLightTheme = value;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,9 @@ class _StartState extends State<Start> {
     double fullScreenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: _isLightTheme ? const Color.fromRGBO(10, 23, 42,1) : const Color.fromRGBO(255, 255, 240, 1),
+      backgroundColor: _isLightTheme
+          ? const Color.fromRGBO(10, 23, 42, 1)
+          : const Color.fromRGBO(255, 255, 240, 1),
       appBar: AppBar(
         title: Builder(
           builder: (context) => GestureDetector(
@@ -70,25 +73,26 @@ class _StartState extends State<Start> {
         height: fullScreenHeight,
         width: fullScreenWidth,
         child: Padding(
-          padding: const EdgeInsets.only(left: 13.0, top: 0,right: 13.0),
+          padding: const EdgeInsets.only(left: 13.0, top: 0, right: 13.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-               const Text(
-                "Mottahid futsal academy",
+              const Text(
+                "Mottahed futsal academy",
                 style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
               ),
               const SizedBox(
-                height: 60,
+                height: 10,
               ),
-               Center(
+              Center(
                 child: Container(
-                  height: 200,
+                  height: 270,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(image: AssetImage("assets/pic/logo.png"),fit: BoxFit.contain)
-                  ),
-                 
+                      image: DecorationImage(
+                    image: AssetImage("assets/pic/logo.png"),
+                    fit: BoxFit.contain,
+                  )),
                 ),
               ),
               const SizedBox(
@@ -96,7 +100,7 @@ class _StartState extends State<Start> {
               ),
               Center(
                 child: SizedBox(
-                  width: fullScreenWidth-120,
+                  width: fullScreenWidth - 120,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -105,14 +109,21 @@ class _StartState extends State<Start> {
                         child: ElevatedButton(
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1))),
+                                    Color.fromRGBO(255, 180, 0, 1.0))),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const Register()),
+                                MaterialPageRoute(
+                                    builder: (context) => const Register()),
                               );
                             },
-                            child: const Text("Register" , style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
+                            child: const Text(
+                              "Register",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: "TrajanPro",
+                                  fontWeight: FontWeight.bold),
+                            )),
                       ),
                       const SizedBox(
                         height: 15,
@@ -122,14 +133,21 @@ class _StartState extends State<Start> {
                         child: ElevatedButton(
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1))),
+                                    Color.fromRGBO(255, 180, 0, 1.0))),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => PlayerList()),
+                                MaterialPageRoute(
+                                    builder: (context) => PlayerList()),
                               );
                             },
-                            child: const Text("Players", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
+                            child: const Text(
+                              "Players",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: "TrajanPro",
+                                  fontWeight: FontWeight.bold),
+                            )),
                       ),
                       const SizedBox(
                         height: 15,
@@ -139,14 +157,21 @@ class _StartState extends State<Start> {
                         child: ElevatedButton(
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1))),
+                                    Color.fromRGBO(255, 180, 0, 1.0))),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Debtors()),
+                                MaterialPageRoute(
+                                    builder: (context) => Debtors()),
                               );
                             },
-                            child: const Text("Debtors", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
+                            child: const Text(
+                              "Debtors",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: "TrajanPro",
+                                  fontWeight: FontWeight.bold),
+                            )),
                       ),
                       const SizedBox(
                         height: 15,
@@ -156,14 +181,21 @@ class _StartState extends State<Start> {
                         child: ElevatedButton(
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1))),
+                                    Color.fromRGBO(255, 180, 0, 1.0))),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Debtors()),
+                                MaterialPageRoute(
+                                    builder: (context) => const Free_Player()),
                               );
                             },
-                            child: const Text("Free Player", style: TextStyle(fontSize: 20,fontFamily: "TrajanPro", fontWeight: FontWeight.bold),)),
+                            child: const Text(
+                              "Free Player",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: "TrajanPro",
+                                  fontWeight: FontWeight.bold),
+                            )),
                       ),
                     ],
                   ),
