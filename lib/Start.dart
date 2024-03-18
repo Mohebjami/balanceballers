@@ -1,7 +1,10 @@
+import 'package:balanceballers/Attendance.dart';
 import 'package:balanceballers/Debtors.dart';
 import 'package:balanceballers/Free_Player.dart';
 import 'package:balanceballers/Players.dart';
 import 'package:balanceballers/Register.dart';
+import 'package:balanceballers/ShowFreePalyer.dart';
+import 'package:balanceballers/showAttendance.dart';
 import 'package:flutter/material.dart';
 
 class Start extends StatefulWidget {
@@ -69,139 +72,222 @@ class _StartState extends State<Start> {
           ),
         ],
       ),
-      body: SizedBox(
-        height: fullScreenHeight,
-        width: fullScreenWidth,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 13.0, top: 0, right: 13.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "Mottahed futsal academy",
-                style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: Container(
-                  height: 270,
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                    image: AssetImage("assets/pic/logo.png"),
-                    fit: BoxFit.contain,
-                  )),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: fullScreenHeight,
+          width: fullScreenWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 13.0, top: 20, right: 13.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  "Mottahed futsal academy",
+                  style:
+                      TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
                 ),
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-              Center(
-                child: SizedBox(
-                  width: fullScreenWidth - 120,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                            style: const ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1.0))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Register()),
-                              );
-                            },
-                            child: const Text(
-                              "Register",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: "TrajanPro",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                            style: const ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1.0))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PlayerList()),
-                              );
-                            },
-                            child: const Text(
-                              "Players",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: "TrajanPro",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                            style: const ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1.0))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Debtors()),
-                              );
-                            },
-                            child: const Text(
-                              "Debtors",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: "TrajanPro",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                            style: const ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1.0))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Free_Player()),
-                              );
-                            },
-                            child: const Text(
-                              "Free Player",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: "TrajanPro",
-                                  fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                    ],
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: Container(
+                    height: 270,
+                    decoration: const BoxDecoration(
+                        image: DecorationImage(
+                      image: AssetImage("assets/pic/logo.png"),
+                      fit: BoxFit.contain,
+                    )),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: SizedBox(
+                    width: fullScreenWidth - 120,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Register()),
+                                );
+                              },
+                              child: const Text(
+                                "Register",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PlayerList()),
+                                );
+                              },
+                              child: const Text(
+                                "Players",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Debtors()),
+                                );
+                              },
+                              child: const Text(
+                                "Debtors",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const Free_Player()),
+                                );
+                              },
+                              child: const Text(
+                                "Free Player",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ShowFreePlayer()),
+                                );
+                              },
+                              child: const Text(
+                                "Show Free Player",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Attendance()),
+                                );
+                              },
+                              child: const Text(
+                                "Attendance",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(255, 180, 0, 1.0))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AttendanceList()),
+                                );
+                              },
+                              child: const Text(
+                                "Show Attendance",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontFamily: "TrajanPro",
+                                    fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

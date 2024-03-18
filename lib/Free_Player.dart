@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 class Free_Player extends StatefulWidget {
   const Free_Player({super.key});
 
@@ -37,47 +38,128 @@ class _Free_PlayerState extends State<Free_Player> {
     double fullScreenHeight = MediaQuery.of(context).size.height;
     double fullScreenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: SizedBox(
-        width: fullScreenWidth,
-        height: fullScreenHeight,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                  hintText: "Name",
+      appBar:  AppBar(
+        title: const Text("Free Player",
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontFamily: "TrajanPro",
+              fontWeight: FontWeight.bold),),
+        backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          width: fullScreenWidth,
+          height: fullScreenHeight,
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 280,
+                      decoration: const BoxDecoration(
+                          image: DecorationImage(image: AssetImage("assets/pic/ball.png"))
+                      ),
+                    )
+                  ],
                 ),
-              ),
-              TextField(
-                controller: lastController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                  hintText: "Last Name",
+                const SizedBox(
+                  height: 50,
                 ),
-              ),
-              SizedBox(
-                width: fullScreenWidth,
-                child: ElevatedButton(
-                  onPressed: () => _selectDate(context),
-                  style: const ButtonStyle(),
-                  child: const Text("Select Date"),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
+                        hintText: "Name",
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextField(
+                      controller: lastController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(borderSide: BorderSide(width: 2)),
+                        hintText: "Last Name",
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: 60,
+                      decoration: const BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              width: 1.0,
+                              color: Colors.grey,
+                            ),
+                            left: BorderSide(
+                              width: 1.0,
+                              color: Colors.grey,
+                            ),
+                            right: BorderSide(
+                              width: 1.0,
+                              color:Colors.grey,
+                            ),
+                            bottom: BorderSide(
+                              width: 1.0,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            InkWell(
+                              child: Text(
+                                _selectedDate != null ? DateFormat('yyyy-MM-dd').format(_selectedDate!) : "Select a Date",
+                                textAlign: TextAlign.center,
+                                // style: TextStyle(color: Color(0xFF000000))
+                              ),
+                              onTap: () {
+                                _selectDate(context);
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_today),
+                              tooltip: 'Tap to open date picker',
+                              onPressed: () => _selectDate(context),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: fullScreenWidth,
+                      child: MaterialButton(
+                        onPressed: () {
+                          createRecord();
+                        },
+                        color: const Color.fromRGBO(255, 180, 0, 1.0),
+                        child: const Text("Submit", style: TextStyle(color: Colors.white, fontSize:20),),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: fullScreenWidth,
-                child: ElevatedButton(
-                  onPressed: () {
-                    createRecord();
-                  },
-                  style: const ButtonStyle(),
-                  child: const Text("Submit"),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

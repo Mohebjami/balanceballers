@@ -38,6 +38,8 @@ dependencies:
   firebase_core: ^2.24.2
   cloud_firestore: ^4.14.0
   firebase_database: ^10.4.0
+  getwidget: ^4.0.0
+  intl: ^0.19.0
   flutter_slidable:
 
 dev_dependencies:
@@ -68,7 +70,10 @@ flutter:
    - assets/pic/moon.png
    - assets/pic/sun.png
    - assets/pic/logo.png
-   - assets/pic/backgroundR.jpg
+   - assets/pic/backgroundRL.jpg
+   - assets/pic/backgroundRD.jpg
+   - assets/pic/approve.png
+   - assets/pic/ball.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
