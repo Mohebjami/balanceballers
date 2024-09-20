@@ -69,11 +69,6 @@ class _PlayerListState extends State<PlayerList> {
     }
   }
 
-  // String _formatJalaliDate(Jalali? date) {
-  //   if (date == null) return 'No Date';
-  //   return '${date.year}/${date.month}/${date.day}';
-  // }
-
 
   String _formatDate(Map<String, dynamic>? dateMap) {
     if (dateMap == null) return 'No Date';
