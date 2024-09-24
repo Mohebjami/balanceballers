@@ -242,6 +242,15 @@ class PlayerInfo extends StatelessWidget {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
+                    _showUpdateDialog(context, 'فیس', lastController,
+                        'Fee', data['Fee']);
+                  },
+                  child:
+                  buildPlayerInfoBox(context, 'فیس', data['Fee']),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
                     _showUpdateDialog(context, 'قرض', debtorController, 'Debt',
                         data['Debt'].toString(),
                         isNumeric: true);
