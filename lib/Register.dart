@@ -16,8 +16,6 @@ class _RegisterState extends State<Register> {
   TextEditingController lastController = TextEditingController();
   TextEditingController feeController = TextEditingController();
 
-
-
   TextEditingController periodController = TextEditingController(text: "1");
   TextEditingController debtorController = TextEditingController();
   String dropdownValue = 'Month';
@@ -33,7 +31,6 @@ class _RegisterState extends State<Register> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked.toDateTime();
-        DateFormat('yyyy-MM-dd').format(_selectedDate!);
         DateFormat('yyyy-MM-dd').format(_selectedDate!);
       });
     }
@@ -207,7 +204,6 @@ class _RegisterState extends State<Register> {
                         InkWell(
                           child: Text(
                             _selectedDate != null
-             
                                 ? pdp.Jalali.fromDateTime(_selectedDate!)
                                     .formatFullDate()
                                 : "تاریخ",
