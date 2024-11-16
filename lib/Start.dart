@@ -72,225 +72,78 @@ class _StartState extends State<Start> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: fullScreenHeight,
-          width: fullScreenWidth,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 13.0, top: 20, right: 13.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  "Mottahed futsal academy",
-                  style:
-                      TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 20.0),
+        children: [
+          const Text(
+            "Mottahed futsal academy",
+            style: TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: Container(
+              height: 270,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/pic/logo.png"),
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: Container(
-                    height: 270,
-                    decoration: const BoxDecoration(
-                        image: DecorationImage(
-                      image: AssetImage("assets/pic/logo.png"),
-                      fit: BoxFit.contain,
-                    )),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: SizedBox(
-                    width: fullScreenWidth - 120,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const Register()),
-                                );
-                              },
-                              child: const Text(
-                                "ثبت نام",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => PlayerList()),
-                                );
-                              },
-                              child: const Text(
-                                "بازیکنان",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Debtors()),
-                                );
-                              },
-                              child: const Text(
-                                "قرض دارها",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const Free_Player()),
-                                );
-                              },
-                              child: const Text(
-                                "   ثبت نام رایگان",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ShowFreePlayer()),
-                                );
-                              },
-                              child: const Text(
-                                "دیدن بازیکنان رایگان",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const Attendance()),
-                                );
-                              },
-                              child: const Text(
-                                "حاضری",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                              style: const ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                      Color.fromRGBO(255, 180, 0, 1.0))),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AttendanceList()),
-                                );
-                              },
-                              child: const Text(
-                                "دیدن حاضری",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontFamily: "TrajanPro",
-                                    fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 20),
+          ..._buildNavigationButtons(fullScreenWidth, context),
+        ],
       ),
     );
+  }
+
+  List<Widget> _buildNavigationButtons(
+      double fullScreenWidth, BuildContext context) {
+    final buttonData = [
+      {"text": "ثبت نام", "destination": const Register()},
+      {"text": "بازیکنان", "destination": PlayerList()},
+      {"text": "قرض دارها", "destination": Debtors()},
+      {"text": "ثبت نام رایگان", "destination": const Free_Player()},
+      {"text": "دیدن بازیکنان رایگان", "destination": ShowFreePlayer()},
+      {"text": "حاضری", "destination": const Attendance()},
+      {"text": "دیدن حاضری", "destination": AttendanceList()},
+    ];
+
+    return buttonData
+        .map(
+          (data) => Padding(
+            padding: const EdgeInsets.only(bottom: 15.0),
+            child: SizedBox(
+              height: 50,
+              width: fullScreenWidth - 120,
+              child: ElevatedButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                    Color.fromRGBO(255, 180, 0, 1.0),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => data['destination'] as Widget),
+                  );
+                },
+                child: Text(
+                  data['text'] as String,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontFamily: "TrajanPro",
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+        .toList();
   }
 }

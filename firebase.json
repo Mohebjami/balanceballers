@@ -1,21 +1,10 @@
 {
   "hosting": {
-<<<<<<< HEAD
-    "source": ".",
-=======
     "public": "build/web",
->>>>>>> 1515bf1 (finaly, fix the register dropdown)
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-<<<<<<< HEAD
-    ],
-    "frameworksBackend": {
-      "region": "asia-east1"
-    }
-=======
     ]
->>>>>>> 1515bf1 (finaly, fix the register dropdown)
   }
 }
