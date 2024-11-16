@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -13,8 +14,11 @@ Future<int> getIsPresentLength() async {
 
   return isPresentDocs.length;
 }
+// ignore: must_be_immutable
 class AttendanceList extends StatelessWidget {
   late String lsN;
+
+  AttendanceList({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

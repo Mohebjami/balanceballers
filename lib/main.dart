@@ -16,10 +16,10 @@ void main() async {
             projectId: "balance-baller",
             storageBucket: "balance-baller.appspot.com",
             messagingSenderId: "519364797751",
-            appId: "1:519364797751:web:f95f5d61be547da56566b2"
-        ));
+            appId: "1:519364797751:web:f95f5d61be547da56566b2"));
   } else {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle());
   runApp(MyApp());
@@ -27,6 +27,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _MyAppState createState() => _MyAppState();
 }
 

@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,6 +29,7 @@ class _RegisterState extends State<Register> {
       firstDate: pdp.Jalali(1403, 1),
       lastDate: pdp.Jalali(1429),
     );
+    // ignore: unrelated_type_equality_checks
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked.toDateTime();
@@ -54,7 +56,6 @@ class _RegisterState extends State<Register> {
               fontWeight: FontWeight.bold),
         ),
       ),
-// backgroundColor: _isLightTheme ? const Color.fromRGBO(255, 255, 240, 1) : const Color.fromRGBO(10, 23, 42,1),
       body: SingleChildScrollView(
         child: Container(
           height: fullScreenHeight,
@@ -261,8 +262,6 @@ class _RegisterState extends State<Register> {
     DateTime? endDate = _selectedDate?.add(Duration(days: proid));
     final persianEndDate = pdp.Jalali.fromDateTime(endDate!);
 
-    String formattedEndDate = persianEndDate.toString();
-
     int debtNum = int.tryParse(debtorController.text) ??
         0; // Ensure debt is parsed as int
 
@@ -293,7 +292,7 @@ class _RegisterState extends State<Register> {
             ),
           );
         }).catchError((error) {
-          print("Failed to add user: $error");
+          // print("Failed to add user: $error");
         });
       } catch (err) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -329,7 +328,7 @@ class _RegisterState extends State<Register> {
             ),
           );
         }).catchError((error) {
-          print("Failed to add user: $error");
+          // print("Failed to add user: $error");
         });
       } catch (err) {
         ScaffoldMessenger.of(context).showSnackBar(

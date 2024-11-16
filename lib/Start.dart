@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:balanceballers/Attendance.dart';
 import 'package:balanceballers/Debtors.dart';
 import 'package:balanceballers/Free_Player.dart';
@@ -10,19 +11,18 @@ import 'package:flutter/material.dart';
 class Start extends StatefulWidget {
   final Function toggleTheme;
 
-  const Start({Key? key, required this.toggleTheme}) : super(key: key);
+  const Start({super.key, required this.toggleTheme});
 
   @override
   State<Start> createState() => _StartState();
 }
 
 class _StartState extends State<Start> {
-  bool _isLightTheme = false; // Declare _isLightTheme
+  bool _isLightTheme = false;
 
-  bool get isLightTheme => _isLightTheme; // Getter for _isLightTheme
+  bool get isLightTheme => _isLightTheme;
 
   set isLightTheme(bool value) {
-    // Setter for _isLightTheme
     setState(() {
       _isLightTheme = value;
     });
@@ -113,7 +113,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -138,7 +138,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -163,7 +163,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -188,7 +188,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -214,7 +214,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -239,7 +239,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(
@@ -264,7 +264,7 @@ class _StartState extends State<Start> {
                           height: 50,
                           child: ElevatedButton(
                               style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(255, 180, 0, 1.0))),
                               onPressed: () {
                                 Navigator.push(

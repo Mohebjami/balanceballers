@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart' as pdp;
 
+// ignore: camel_case_types
 class Free_Player extends StatefulWidget {
   const Free_Player({super.key});
 
@@ -9,6 +12,7 @@ class Free_Player extends StatefulWidget {
   State<Free_Player> createState() => _Free_PlayerState();
 }
 
+// ignore: camel_case_types
 class _Free_PlayerState extends State<Free_Player> {
   pdp.Jalali? _selectedDate;
 
@@ -170,7 +174,7 @@ class _Free_PlayerState extends State<Free_Player> {
           ),
         );
       }).catchError((error) {
-        print("Failed to add user: $error");
+        // print("Failed to add user: $error");
       });
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(

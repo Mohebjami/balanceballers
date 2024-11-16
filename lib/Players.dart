@@ -1,3 +1,6 @@
+// ignore: file_names
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:balanceballers/PlayerInfo.dart';
 import 'package:balanceballers/showAttendance.dart';
@@ -6,12 +9,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart' as pdp;
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 
 
 class PlayerList extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _PlayerListState createState() => _PlayerListState();
 }
 
@@ -45,7 +48,7 @@ class _PlayerListState extends State<PlayerList> {
         int remainingDays = endDate.difference(DateTime.now()).inDays;
         if (remainingDays > 0) {
           doc.reference.update(
-              {'remainingDays': remainingDays}); // Update 'remainingDays' field
+              {'remainingDays': remainingDays});
         } else {
           await debtorsRef.add(data);
           await doc.reference.delete();
@@ -64,7 +67,7 @@ class _PlayerListState extends State<PlayerList> {
       return jalaliDate.toDateTime();
     } catch (e) {
       // Handle error and provide a default or log the error
-      print('Error converting Persian date: $e');
+      // print('Error converting Persian date: $e');
       return DateTime.now(); // fallback
     }
   }
@@ -118,10 +121,10 @@ class _PlayerListState extends State<PlayerList> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: (searchString == null || searchString.trim() == '')
+              stream: (searchString.trim() == '')
                   ? playersRef.snapshots()
                   : playersRef.orderBy('Name').startAt([searchString]).endAt(
-                  [searchString + '\uf8ff']).snapshots(),
+                  ['$searchString\uf8ff']).snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
                   return const Text('Something went wrong');

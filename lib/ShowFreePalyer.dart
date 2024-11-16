@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ShowFreePlayer extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _ShowFreePlayerState createState() => _ShowFreePlayerState();
 }
 

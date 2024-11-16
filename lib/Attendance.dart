@@ -62,7 +62,6 @@ class _AttendanceState extends State<Attendance> {
                           child: GFToggle(
                             onChanged: (val) {
                               data['isPresent'] = val!;
-                              print(data['isPresent']);
                             },
                             value: data['isPresent'],
                             enabledThumbColor: Colors.white,
@@ -97,7 +96,6 @@ class _AttendanceState extends State<Attendance> {
                         'isPresent': data['isPresent'],
                       });
                     }
-                    print("Saved");
                   },
                   color: const Color.fromRGBO(255, 180, 0, 1.0),
                   child: const Text(
