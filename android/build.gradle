@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 buildscript {
     ext.kotlin_version = '1.7.10'
     repositories {
@@ -11,6 +12,8 @@ buildscript {
     }
 }
 
+=======
+>>>>>>> 1515bf1 (finaly, fix the register dropdown)
 allprojects {
     repositories {
         google()
@@ -18,12 +21,20 @@ allprojects {
     }
 }
 
+<<<<<<< HEAD
 rootProject.buildDir = '../build'
+=======
+rootProject.buildDir = "../build"
+>>>>>>> 1515bf1 (finaly, fix the register dropdown)
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
+<<<<<<< HEAD
     project.evaluationDependsOn(':app')
+=======
+    project.evaluationDependsOn(":app")
+>>>>>>> 1515bf1 (finaly, fix the register dropdown)
 }
 
 tasks.register("clean", Delete) {

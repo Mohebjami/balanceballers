@@ -15,9 +15,12 @@ class _RegisterState extends State<Register> {
   TextEditingController nameController = TextEditingController();
   TextEditingController lastController = TextEditingController();
   TextEditingController feeController = TextEditingController();
-  TextEditingController periodController = TextEditingController();
+
+
+
+  TextEditingController periodController = TextEditingController(text: "1");
   TextEditingController debtorController = TextEditingController();
-  String dropdownValue = 'Week';
+  String dropdownValue = 'Month';
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -30,7 +33,8 @@ class _RegisterState extends State<Register> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked.toDateTime();
-        String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+        DateFormat('yyyy-MM-dd').format(_selectedDate!);
+        DateFormat('yyyy-MM-dd').format(_selectedDate!);
       });
     }
   }
@@ -134,7 +138,7 @@ class _RegisterState extends State<Register> {
                           dropdownValue = newValue!;
                         });
                       },
-                      items: <String>['Week', 'Month']
+                      items: <String>['Month', 'Week']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -203,7 +207,9 @@ class _RegisterState extends State<Register> {
                         InkWell(
                           child: Text(
                             _selectedDate != null
-                                ? pdp.Jalali.fromDateTime(_selectedDate!).formatFullDate()
+             
+                                ? pdp.Jalali.fromDateTime(_selectedDate!)
+                                    .formatFullDate()
                                 : "تاریخ",
                             textAlign: TextAlign.center,
                           ),
@@ -220,7 +226,6 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                 ),
-
                 const SizedBox(
                   height: 30,
                 ),
@@ -232,7 +237,7 @@ class _RegisterState extends State<Register> {
                       createRecord();
                     },
                     style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                       Color.fromRGBO(255, 180, 0, 1.0),
                     )),
                     child: const Text(

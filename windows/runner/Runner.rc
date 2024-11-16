@@ -89,11 +89,19 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
+<<<<<<< HEAD
             VALUE "CompanyName", "com.balanceballers" "\0"
             VALUE "FileDescription", "balanceballers" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "balanceballers" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.balanceballers. All rights reserved." "\0"
+=======
+            VALUE "CompanyName", "com.example" "\0"
+            VALUE "FileDescription", "balanceballers" "\0"
+            VALUE "FileVersion", VERSION_AS_STRING "\0"
+            VALUE "InternalName", "balanceballers" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
+>>>>>>> 1515bf1 (finaly, fix the register dropdown)
             VALUE "OriginalFilename", "balanceballers.exe" "\0"
             VALUE "ProductName", "balanceballers" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

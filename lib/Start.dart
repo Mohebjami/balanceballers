@@ -85,7 +85,7 @@ class _StartState extends State<Start> {
                 const Text(
                   "Mottahed futsal academy",
                   style:
-                  TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
+                      TextStyle(fontSize: 40, fontFamily: "ProtestGuerrilla"),
                 ),
                 const SizedBox(
                   height: 10,
@@ -95,9 +95,9 @@ class _StartState extends State<Start> {
                     height: 270,
                     decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage("assets/pic/logo.png"),
-                          fit: BoxFit.contain,
-                        )),
+                      image: AssetImage("assets/pic/logo.png"),
+                      fit: BoxFit.contain,
+                    )),
                   ),
                 ),
                 const SizedBox(
@@ -195,7 +195,7 @@ class _StartState extends State<Start> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                      const Free_Player()),
+                                          const Free_Player()),
                                 );
                               },
                               child: const Text(
