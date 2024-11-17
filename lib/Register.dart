@@ -344,7 +344,7 @@ class _RegisterState extends State<Register> {
             .add({
               'Name': nameController.text,
               'Last Name': lastController.text,
-              'Debt': debtNum, // Store debt as an integer in Debtors collection
+              'Debt': debtNum,
             })
             .then((value) {})
             .catchError((error) {

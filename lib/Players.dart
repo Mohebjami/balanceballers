@@ -1,6 +1,3 @@
-// ignore: file_names
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 import 'package:balanceballers/PlayerInfo.dart';
 import 'package:balanceballers/showAttendance.dart';
@@ -9,12 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart' as pdp;
-
-
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 class PlayerList extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _PlayerListState createState() => _PlayerListState();
 }
 
@@ -48,7 +43,7 @@ class _PlayerListState extends State<PlayerList> {
         int remainingDays = endDate.difference(DateTime.now()).inDays;
         if (remainingDays > 0) {
           doc.reference.update(
-              {'remainingDays': remainingDays});
+              {'remainingDays': remainingDays}); // Update 'remainingDays' field
         } else {
           await debtorsRef.add(data);
           await doc.reference.delete();
@@ -67,11 +62,10 @@ class _PlayerListState extends State<PlayerList> {
       return jalaliDate.toDateTime();
     } catch (e) {
       // Handle error and provide a default or log the error
-      // print('Error converting Persian date: $e');
+      print('Error converting Persian date: $e');
       return DateTime.now(); // fallback
     }
   }
-
 
   String _formatDate(Map<String, dynamic>? dateMap) {
     if (dateMap == null) return 'No Date';
@@ -121,11 +115,12 @@ class _PlayerListState extends State<PlayerList> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: (searchString.trim() == '')
+              stream: (searchString == null || searchString.trim() == '')
                   ? playersRef.snapshots()
                   : playersRef.orderBy('Name').startAt([searchString]).endAt(
-                  ['$searchString\uf8ff']).snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      [searchString + '\uf8ff']).snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
                   return const Text('Something went wrong');
                 }
@@ -137,9 +132,12 @@ class _PlayerListState extends State<PlayerList> {
 
                 // Store the player documents in a list and calculate remainingDays
                 List<DocumentSnapshot> playerDocs = snapshot.data?.docs ?? [];
-                List<Map<String, dynamic>> playersWithRemainingDays = playerDocs.map((doc) {
-                  Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-                  DateTime endDate = _convertPersianToDateTime(data['End Date']);
+                List<Map<String, dynamic>> playersWithRemainingDays =
+                    playerDocs.map((doc) {
+                  Map<String, dynamic> data =
+                      doc.data() as Map<String, dynamic>;
+                  DateTime endDate =
+                      _convertPersianToDateTime(data['End Date']);
                   int remainingDays = endDate.difference(DateTime.now()).inDays;
                   return {
                     'doc': doc,
@@ -155,7 +153,6 @@ class _PlayerListState extends State<PlayerList> {
                   DateTime dateB = _convertPersianToDateTime(b['data']['Date']);
                   return dateA.compareTo(dateB);
                 });
-
 
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -181,24 +178,30 @@ class _PlayerListState extends State<PlayerList> {
                                     icon: Icons.delete_forever,
                                     label: 'حذف',
                                     onPressed: (context) async {
-                                      await FirebaseFirestore.instance.runTransaction(
-                                            (Transaction myTransaction) async {
+                                      await FirebaseFirestore.instance
+                                          .runTransaction(
+                                        (Transaction myTransaction) async {
                                           String name = data['Name'];
                                           String lastName = data['Last Name'];
                                           QuerySnapshot attendanceSnapshot =
-                                          await attendanceRef
-                                              .where('Name', isEqualTo: name)
-                                              .where('Last Name', isEqualTo: lastName)
-                                              .get();
-                                          for (var doc in attendanceSnapshot.docs) {
+                                              await attendanceRef
+                                                  .where('Name',
+                                                      isEqualTo: name)
+                                                  .where('Last Name',
+                                                      isEqualTo: lastName)
+                                                  .get();
+                                          for (var doc
+                                              in attendanceSnapshot.docs) {
                                             await doc.reference.delete();
-                                            ScaffoldMessenger.of(context).showSnackBar(
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
                                               const SnackBar(
                                                 content: Text('Deleted'),
                                               ),
                                             );
                                           }
-                                          myTransaction.delete(document.reference);
+                                          myTransaction
+                                              .delete(document.reference);
                                         },
                                       );
                                     },
@@ -206,15 +209,20 @@ class _PlayerListState extends State<PlayerList> {
                                 ],
                               ),
                               child: ListTile(
-                                title: Text("${data['Name'].toString()} ${data['Last Name']}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                title: Text(
+                                    "${data['Name'].toString()} ${data['Last Name']}",
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
                                 leading: CircleAvatar(
                                   backgroundColor: remainingDays > 5
                                       ? Colors.green
                                       : (remainingDays >= 0
-                                      ? Colors.yellow
-                                      : Colors.red),
+                                          ? Colors.yellow
+                                          : Colors.red),
                                   child: Text(remainingDays.toString(),
-                                      style: const TextStyle(color: Colors.white)),
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 ),
                                 subtitle: Text(_formatDate(data['Date']),
                                     style: const TextStyle(
@@ -228,7 +236,8 @@ class _PlayerListState extends State<PlayerList> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => PlayerInfo(data: data),
+                                      builder: (context) =>
+                                          PlayerInfo(data: data),
                                     ),
                                   );
                                 },
@@ -243,7 +252,6 @@ class _PlayerListState extends State<PlayerList> {
               },
             ),
           ),
-
         ],
       ),
     );

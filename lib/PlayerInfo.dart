@@ -1,15 +1,11 @@
-// ignore: file_names
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
-// ignore: must_be_immutable
 class PlayerInfo extends StatelessWidget {
   final Map data;
-  PlayerInfo({super.key, required this.data});
+  PlayerInfo({Key? key, required this.data}) : super(key: key);
 
   Future<int> getAttendanceCount(String userId, bool isPresent) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -27,8 +23,8 @@ class PlayerInfo extends StatelessWidget {
   TextEditingController debtorController = TextEditingController();
   String dropdownValue = 'Week';
   Jalali? _selectedDate;
-  final bool _isLightTheme = false;
-  String? _selectedPeriod = 'Week';
+  bool _isLightTheme = false; // Theme state
+  String? _selectedPeriod = 'Week'; // Default period
 
   Future<void> _selectDate(BuildContext context) async {
     final Jalali? picked = await showPersianDatePicker(
@@ -117,26 +113,40 @@ class PlayerInfo extends StatelessWidget {
                 ),
                 ElevatedButton(
                   child: const Text('Save'),
+                  // Inside your onPressed function in the save button
+
                   onPressed: () async {
                     if (_selectedDate != null &&
                         periodController.text.isNotEmpty) {
                       int periods = int.tryParse(periodController.text) ?? 1;
+
+                      // Update the start date in Firestore
                       _updatePlayerInfo('Date', {
                         'year': _selectedDate!.year,
                         'month': _selectedDate!.month,
                         'day': _selectedDate!.day,
                       });
+
+                      // Initialize endDate with the selected date
                       Jalali endDate = _selectedDate!;
+
+                      // Calculate the end date based on the selected period
                       if (dropdownValue == 'Week') {
                         endDate = _selectedDate!.addDays(periods * 7);
                       } else {
                         endDate = _selectedDate!.addDays(periods * 30);
                       }
+
+                      // Update the end date in Firestore
                       _updatePlayerInfo('End Date', {
                         'year': endDate.year,
                         'month': endDate.month,
                         'day': endDate.day,
                       });
+                      // ----------------------------------------------------------------------------
+                      // ----------------------------------------------------------------------------
+
+                      // Retrieve the player's documentId from Firestore using name and last name
                       QuerySnapshot playerSnapshot = await FirebaseFirestore
                           .instance
                           .collection('players')
@@ -145,24 +155,30 @@ class PlayerInfo extends StatelessWidget {
                           .get();
 
                       if (playerSnapshot.docs.isNotEmpty) {
+                        // Assuming there is only one document with this name and last name
                         String documentId = playerSnapshot.docs.first.id;
 
+                        // Now you can update the Period using this documentId
                         CollectionReference collection =
                             FirebaseFirestore.instance.collection('players');
                         try {
                           await collection.doc(documentId).update({
                             'Period': periods,
                           });
-                          // print('Period updated successfully');
+                          print('Period updated successfully');
                         } catch (e) {
-                          // print('Failed to update Period: $e');
+                          print('Failed to update Period: $e');
                         }
                       } else {
-                        // print('Error: Player not found');
+                        print('Error: Player not found');
                       }
+
+                      // ----------------------------------------------------------------------------
+                      // ----------------------------------------------------------------------------
+
                       Navigator.of(context).pop();
                     } else {
-                      // print("Error: Date or period is not selected");
+                      print("Error: Date or period is not selected");
                     }
                   },
                 ),
@@ -229,7 +245,8 @@ class PlayerInfo extends StatelessWidget {
                     _showUpdateDialog(
                         context, 'فیس', lastController, 'Fee', data['Fee']);
                   },
-                  child: buildPlayerInfoBox(context, 'فیس', data['Fee']),
+                  child: buildPlayerInfoBox(
+                      context, 'فیس', data['Fee']?.toString() ?? '0'),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
@@ -419,10 +436,11 @@ class PlayerInfo extends StatelessWidget {
                       'day': _selectedDate!.day,
                       'period': _selectedPeriod,
                     };
+                    print("Saving Date with period: ${_selectedPeriod}");
                     _updatePlayerInfo(field, dateMap);
                     Navigator.of(context).pop();
                   } else {
-                    // print("Error: No date selected");
+                    print("Error: No date selected");
                   }
                 },
               ),
@@ -451,6 +469,7 @@ class PlayerInfo extends StatelessWidget {
               TextButton(
                 child: const Text('Save'),
                 onPressed: () {
+                  print("Saving value: ${controller.text}");
                   _updatePlayerInfo(field, controller.text);
                   Navigator.of(context).pop();
                 },
@@ -463,14 +482,18 @@ class PlayerInfo extends StatelessWidget {
   }
 
   void _updatePlayerInfo(String field, dynamic value) async {
+    print("Updating field: $field with value: $value");
+
     String name = data['Name'];
     String lastName = data['Last Name'];
 
+    // Query to find the player in the players collection
     Query playerQuery = FirebaseFirestore.instance
         .collection('players')
         .where('Name', isEqualTo: name)
         .where('Last Name', isEqualTo: lastName);
 
+    // Query to find the player in the Debtors collection
     Query debtorQuery = FirebaseFirestore.instance
         .collection('Debtors')
         .where('Name', isEqualTo: name)
@@ -482,49 +505,61 @@ class PlayerInfo extends StatelessWidget {
       if (playerSnapshot.docs.isNotEmpty) {
         for (var doc in playerSnapshot.docs) {
           DocumentReference docRef = doc.reference;
+
+          // If updating the 'Debt' field
           if (field == 'Debt') {
-            int debtValue = int.tryParse(value) ?? 0;
+            int debtValue = int.tryParse(value) ?? 0; // Convert value to int
             await docRef.update({field: debtValue});
 
+            // Handle updating 'Debtors' collection
             if (debtValue > 0) {
+              // Check if player exists in 'Debtors'
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
+                // Player exists in 'Debtors', update the debt
                 for (var debtorDoc in debtorSnapshot.docs) {
                   DocumentReference debtorDocRef = debtorDoc.reference;
                   await debtorDocRef.update({'Debt': debtValue});
+                  print("Player's debt updated in Debtors: $debtValue");
                 }
               } else {
+                // Player does not exist in 'Debtors', add them
                 await FirebaseFirestore.instance.collection('Debtors').add({
                   'Name': name,
                   'Last Name': lastName,
                   'Debt': debtValue,
                 });
+                print("Player added to Debtors with debt: $debtValue");
               }
             } else {
+              // Remove player from 'Debtors' if debt is 0 or less
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
                 for (var debtorDoc in debtorSnapshot.docs) {
                   await debtorDoc.reference.delete();
+                  print("Player removed from Debtors as debt is cleared.");
                 }
               }
             }
           } else if (field == 'Date') {
+            // Ensure value is a Map for date fields
             if (value is Map<String, dynamic>) {
               await docRef.update({field: value});
             } else {
-              // print(
-              //     "Error: Value for Date field is not a Map<String, dynamic>");
+              print(
+                  "Error: Value for Date field is not a Map<String, dynamic>");
             }
           } else {
             await docRef.update({field: value});
           }
-          // print("$field updated successfully in players collection.");
+
+          print("$field updated successfully in players collection.");
         }
       } else {
-        // print("No player found for update in players collection!");
+        print("No player found for update in players collection!");
       }
     } catch (error) {
-      // print("Error updating document: $error");
+      print("Error updating document: $error");
     }
   }
 }
