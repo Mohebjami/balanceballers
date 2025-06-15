@@ -1,4 +1,4 @@
-import 'package:balanceballers/PlayerInfo.dart';
+import 'package:balanceballers/player_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';

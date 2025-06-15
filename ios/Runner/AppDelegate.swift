@@ -1,14 +1,14 @@
-<<<<<<< HEAD
+
 import UIKit
 import Flutter
 
 @UIApplicationMain
-=======
+
 import Flutter
 import UIKit
 
 @main
->>>>>>> 1515bf1 (finaly, fix the register dropdown)
+ 
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
     _ application: UIApplication,

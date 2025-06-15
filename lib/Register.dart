@@ -16,6 +16,7 @@ class _RegisterState extends State<Register> {
   TextEditingController nameController = TextEditingController();
   TextEditingController lastController = TextEditingController();
   TextEditingController feeController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
 
   TextEditingController periodController = TextEditingController(text: "1");
   TextEditingController debtorController = TextEditingController();
@@ -92,6 +93,36 @@ class _RegisterState extends State<Register> {
                     hintText: "فامیلی",
                   ),
                   textAlign: TextAlign.right,
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                DropdownButtonFormField<String>(
+                  value: typeController.text.isNotEmpty
+                      ? typeController.text
+                      : null,
+                  items: [
+                    'صبح',
+                    'بعد از ظهر',
+                    'وی ای پی',
+                    'جوانان',
+                    'نوجوانان',
+                  ].map((type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      typeController.text = newValue!;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    border:
+                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
+                    hintText: "رده سنی",
+                  ),
                 ),
                 const SizedBox(
                   height: 5,
@@ -272,6 +303,7 @@ class _RegisterState extends State<Register> {
         await collRef.add({
           'Name': nameController.text,
           'Last Name': lastController.text,
+          'Type': typeController.text,
           'Fee': feeController.text,
           'Period': periodController.text,
           'Debt': debtNum, // Store debt as an integer
@@ -308,6 +340,7 @@ class _RegisterState extends State<Register> {
         await collRef.add({
           'Name': nameController.text,
           'Last Name': lastController.text,
+          'Type': typeController.text,
           'Fee': feeController.text,
           'Period': periodController.text,
           'Debt': debtNum, // Store debt as an integer

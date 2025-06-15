@@ -1,12 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
-class PlayerInfo extends StatelessWidget {
+class PlayerInfo extends StatefulWidget {
   final Map data;
-  PlayerInfo({Key? key, required this.data}) : super(key: key);
+  const PlayerInfo({super.key, required this.data});
 
+  @override
+  State<PlayerInfo> createState() => _PlayerInfoState();
+}
+
+class _PlayerInfoState extends State<PlayerInfo> {
   Future<int> getAttendanceCount(String userId, bool isPresent) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('Attendance')
@@ -16,16 +24,40 @@ class PlayerInfo extends StatelessWidget {
     return querySnapshot.docs.length;
   }
 
-  TextEditingController nameController = TextEditingController();
-  TextEditingController lastController = TextEditingController();
-  TextEditingController feeController = TextEditingController();
-  TextEditingController periodController = TextEditingController();
-  TextEditingController debtorController = TextEditingController();
-  String dropdownValue = 'Week';
-  Jalali? _selectedDate;
-  bool _isLightTheme = false; // Theme state
-  String? _selectedPeriod = 'Week'; // Default period
+  final List<String> _typeOptions = [
+    'صبح',
+    'بعد از ظهر',
+    'وی ای پی',
+    'جوانان',
+    'نوجوانان',
+  ];
+  String? _selectedType;
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current value
+    _selectedType = widget.data['Type'];
+  }
+
+  TextEditingController nameController = TextEditingController();
+
+  TextEditingController lastController = TextEditingController();
+
+  TextEditingController feeController = TextEditingController();
+
+  TextEditingController periodController = TextEditingController();
+
+  TextEditingController debtorController = TextEditingController();
+
+  String dropdownValue = 'Week';
+
+  Jalali? _selectedDate;
+
+  final bool _isLightTheme = false;
+// Theme state
+  String? _selectedPeriod = 'Week';
+// Default period
   Future<void> _selectDate(BuildContext context) async {
     final Jalali? picked = await showPersianDatePicker(
       context: context,
@@ -35,7 +67,7 @@ class PlayerInfo extends StatelessWidget {
     );
     if (picked != null && picked != _selectedDate) {
       _selectedDate = picked;
-      // Show period selection dialog
+// Show period selection dialog
       _showPeriodSelectionDialog(context);
     }
   }
@@ -113,52 +145,50 @@ class PlayerInfo extends StatelessWidget {
                 ),
                 ElevatedButton(
                   child: const Text('Save'),
-                  // Inside your onPressed function in the save button
+// Inside your onPressed function in the save button
 
                   onPressed: () async {
                     if (_selectedDate != null &&
                         periodController.text.isNotEmpty) {
                       int periods = int.tryParse(periodController.text) ?? 1;
 
-                      // Update the start date in Firestore
+// Update the start date in Firestore
                       _updatePlayerInfo('Date', {
                         'year': _selectedDate!.year,
                         'month': _selectedDate!.month,
                         'day': _selectedDate!.day,
                       });
 
-                      // Initialize endDate with the selected date
+// Initialize endDate with the selected date
                       Jalali endDate = _selectedDate!;
 
-                      // Calculate the end date based on the selected period
+// Calculate the end date based on the selected period
                       if (dropdownValue == 'Week') {
                         endDate = _selectedDate!.addDays(periods * 7);
                       } else {
                         endDate = _selectedDate!.addDays(periods * 30);
                       }
 
-                      // Update the end date in Firestore
+// Update the end date in Firestore
                       _updatePlayerInfo('End Date', {
                         'year': endDate.year,
                         'month': endDate.month,
                         'day': endDate.day,
                       });
-                      // ----------------------------------------------------------------------------
-                      // ----------------------------------------------------------------------------
-
-                      // Retrieve the player's documentId from Firestore using name and last name
+// Retrieve the player's documentId from Firestore using name and last name
                       QuerySnapshot playerSnapshot = await FirebaseFirestore
                           .instance
                           .collection('players')
-                          .where('Name', isEqualTo: data['Name'])
-                          .where('Last Name', isEqualTo: data['Last Name'])
+                          .where('Name', isEqualTo: widget.data['Name'])
+                          .where('Last Name',
+                              isEqualTo: widget.data['Last Name'])
                           .get();
 
                       if (playerSnapshot.docs.isNotEmpty) {
-                        // Assuming there is only one document with this name and last name
+// Assuming there is only one document with this name and last name
                         String documentId = playerSnapshot.docs.first.id;
 
-                        // Now you can update the Period using this documentId
+// Now you can update the Period using this documentId
                         CollectionReference collection =
                             FirebaseFirestore.instance.collection('players');
                         try {
@@ -172,10 +202,6 @@ class PlayerInfo extends StatelessWidget {
                       } else {
                         print('Error: Player not found');
                       }
-
-                      // ----------------------------------------------------------------------------
-                      // ----------------------------------------------------------------------------
-
                       Navigator.of(context).pop();
                     } else {
                       print("Error: Date or period is not selected");
@@ -225,38 +251,151 @@ class PlayerInfo extends StatelessWidget {
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    _showUpdateDialog(
-                        context, 'نام', nameController, 'Name', data['Name']);
+                    _showUpdateDialog(context, 'نام', nameController, 'Name',
+                        widget.data['Name']);
                   },
-                  child: buildPlayerInfoBox(context, 'نام', data['Name']),
+                  child:
+                      buildPlayerInfoBox(context, 'نام', widget.data['Name']),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
                     _showUpdateDialog(context, 'فامیلی', lastController,
-                        'Last Name', data['Last Name']);
+                        'Last Name', widget.data['Last Name']);
                   },
-                  child:
-                      buildPlayerInfoBox(context, 'فامیلی', data['Last Name']),
+                  child: buildPlayerInfoBox(
+                      context, 'فامیلی', widget.data['Last Name']),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    _showUpdateDialog(
-                        context, 'فیس', lastController, 'Fee', data['Fee']);
+                    showDialog(
+                      context: context,
+                      builder: (
+                        BuildContext context,
+                      ) {
+                        return StatefulBuilder(builder:
+                            (BuildContext context, StateSetter setStateDialog) {
+                          return AlertDialog(
+                            backgroundColor: _isLightTheme
+                                ? const Color.fromRGBO(10, 23, 42, 1)
+                                : const Color.fromRGBO(255, 255, 240, 1),
+                            title: const Text('انتخاب رده سنی'),
+                            content: Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Colors.white
+                                      : const Color(0xFF1E1E2C),
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                  border: Border.all(
+                                    color:
+                                        const Color.fromRGBO(255, 180, 0, 1.0),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 4),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    dropdownColor:
+                                        Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.white
+                                            : const Color(0xFF1E1E2C),
+                                    value: _selectedType,
+                                    icon: const Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Color.fromRGBO(255, 180, 0, 1.0),
+                                        size: 28),
+                                    elevation: 12,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black87
+                                          : Colors.white,
+                                    ),
+                                    hint: const Text(
+                                      'انتخاب رده سنی',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    onChanged: (String? newValue) {
+                                      setStateDialog(() {
+                                        _selectedType = newValue;
+                                      });
+                                    },
+                                    items: _typeOptions.map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('لغو'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              ElevatedButton(
+                                child: const Text('ثبت'),
+                                onPressed: () {
+                                  if (_selectedType != null) {
+                                    _updatePlayerInfo('Type', _selectedType);
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    print("Error: No type selected");
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                      },
+                    );
                   },
                   child: buildPlayerInfoBox(
-                      context, 'فیس', data['Fee']?.toString() ?? '0'),
+                      context, 'رده سنی', widget.data['Type'] ?? 'نامشخص'),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    _showUpdateDialog(context, 'فیس', lastController, 'Fee',
+                        widget.data['Fee']);
+                  },
+                  child: buildPlayerInfoBox(
+                      context, 'فیس', widget.data['Fee']?.toString() ?? '0'),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
                     _showUpdateDialog(context, 'قرض', debtorController, 'Debt',
-                        data['Debt'].toString(),
+                        widget.data['Debt'].toString(),
                         isNumeric: true);
                   },
                   child: buildPlayerInfoBox(
-                      context, 'قرض', data['Debt'].toString()),
+                      context, 'قرض', widget.data['Debt'].toString()),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
@@ -268,24 +407,25 @@ class PlayerInfo extends StatelessWidget {
                     'تاریخ ثبت نام',
                     _selectedDate != null
                         ? _formatJalaliDate(_selectedDate)
-                        : _formatDate(data['Date']),
+                        : _formatDate(widget.data['Date']),
                   ),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    // Optional: Add functionality for end date selection if needed
+// Optional: Add functionality for end date selection if needed
                   },
                   child: buildPlayerInfoBox(
                     context,
                     'تاریخ پایان',
-                    _formatDate(data['End Date']),
+                    _formatDate(widget.data['End Date']),
                   ),
                 ),
                 const SizedBox(height: 20),
-                if (data.containsKey('userId') && data['userId'] != null)
+                if (widget.data.containsKey('userId') &&
+                    widget.data['userId'] != null)
                   FutureBuilder<int>(
-                    future: getAttendanceCount(data['userId'], true),
+                    future: getAttendanceCount(widget.data['userId'], true),
                     builder:
                         (BuildContext context, AsyncSnapshot<int> snapshot) {
                       if (snapshot.hasData) {
@@ -296,9 +436,10 @@ class PlayerInfo extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     },
                   ),
-                if (data.containsKey('userId') && data['userId'] != null)
+                if (widget.data.containsKey('userId') &&
+                    widget.data['userId'] != null)
                   FutureBuilder<int>(
-                    future: getAttendanceCount(data['userId'], false),
+                    future: getAttendanceCount(widget.data['userId'], false),
                     builder:
                         (BuildContext context, AsyncSnapshot<int> snapshot) {
                       if (snapshot.hasData) {
@@ -375,12 +516,12 @@ class PlayerInfo extends StatelessWidget {
       TextEditingController controller, String field, String initialValue,
       {bool isNumeric = false}) {
     if (field == 'Date') {
-      // Initialize the _selectedDate with the existing date from data if available
-      if (data['Date'] != null) {
+// Initialize the _selectedDate with the existing date from data if available
+      if (widget.data['Date'] != null) {
         _selectedDate = Jalali(
-          data['Date']['year'],
-          data['Date']['month'],
-          data['Date']['day'],
+          widget.data['Date']['year'],
+          widget.data['Date']['month'],
+          widget.data['Date']['day'],
         );
       }
 
@@ -436,7 +577,9 @@ class PlayerInfo extends StatelessWidget {
                       'day': _selectedDate!.day,
                       'period': _selectedPeriod,
                     };
-                    print("Saving Date with period: ${_selectedPeriod}");
+                    if (kDebugMode) {
+                      print("Saving Date with period: $_selectedPeriod");
+                    }
                     _updatePlayerInfo(field, dateMap);
                     Navigator.of(context).pop();
                   } else {
@@ -484,46 +627,46 @@ class PlayerInfo extends StatelessWidget {
   void _updatePlayerInfo(String field, dynamic value) async {
     print("Updating field: $field with value: $value");
 
-    String name = data['Name'];
-    String lastName = data['Last Name'];
+    String name = widget.data['Name'];
+    String lastName = widget.data['Last Name'];
 
-    // Query to find the player in the players collection
+// Query to find the player in the players collection
     Query playerQuery = FirebaseFirestore.instance
         .collection('players')
         .where('Name', isEqualTo: name)
         .where('Last Name', isEqualTo: lastName);
 
-    // Query to find the player in the Debtors collection
+// Query to find the player in the Debtors collection
     Query debtorQuery = FirebaseFirestore.instance
         .collection('Debtors')
         .where('Name', isEqualTo: name)
         .where('Last Name', isEqualTo: lastName);
 
     try {
-      // Update player info in 'players' collection
+// Update player info in 'players' collection
       QuerySnapshot playerSnapshot = await playerQuery.get();
       if (playerSnapshot.docs.isNotEmpty) {
         for (var doc in playerSnapshot.docs) {
           DocumentReference docRef = doc.reference;
 
-          // If updating the 'Debt' field
+// If updating the 'Debt' field
           if (field == 'Debt') {
             int debtValue = int.tryParse(value) ?? 0; // Convert value to int
             await docRef.update({field: debtValue});
 
-            // Handle updating 'Debtors' collection
+// Handle updating 'Debtors' collection
             if (debtValue > 0) {
-              // Check if player exists in 'Debtors'
+// Check if player exists in 'Debtors'
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
-                // Player exists in 'Debtors', update the debt
+// Player exists in 'Debtors', update the debt
                 for (var debtorDoc in debtorSnapshot.docs) {
                   DocumentReference debtorDocRef = debtorDoc.reference;
                   await debtorDocRef.update({'Debt': debtValue});
                   print("Player's debt updated in Debtors: $debtValue");
                 }
               } else {
-                // Player does not exist in 'Debtors', add them
+// Player does not exist in 'Debtors', add them
                 await FirebaseFirestore.instance.collection('Debtors').add({
                   'Name': name,
                   'Last Name': lastName,
@@ -532,7 +675,7 @@ class PlayerInfo extends StatelessWidget {
                 print("Player added to Debtors with debt: $debtValue");
               }
             } else {
-              // Remove player from 'Debtors' if debt is 0 or less
+// Remove player from 'Debtors' if debt is 0 or less
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
                 for (var debtorDoc in debtorSnapshot.docs) {
@@ -542,7 +685,7 @@ class PlayerInfo extends StatelessWidget {
               }
             }
           } else if (field == 'Date') {
-            // Ensure value is a Map for date fields
+// Ensure value is a Map for date fields
             if (value is Map<String, dynamic>) {
               await docRef.update({field: value});
             } else {

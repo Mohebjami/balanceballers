@@ -1,4 +1,4 @@
-import 'package:balanceballers/PlayerInfo.dart';
+import 'package:balanceballers/player_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -18,6 +18,7 @@ class _DebtorsState extends State<Debtors> {
   Color coYellow = const Color.fromRGBO(255, 180, 0, 1.0);
   bool _isLightTheme = false; // Declare _isLightTheme
 
+  // ignore: unnecessary_getters_setters
   bool get isLightTheme => _isLightTheme; // Getter for _isLightTheme
 
   set isLightTheme(bool value) {
@@ -28,7 +29,6 @@ class _DebtorsState extends State<Debtors> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     fetchWaitingData();
   }
@@ -58,7 +58,6 @@ class _DebtorsState extends State<Debtors> {
 
   @override
   Widget build(BuildContext context) {
-    double fullScreenHeight = MediaQuery.of(context).size.height;
     double fullScreenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -95,7 +94,7 @@ class _DebtorsState extends State<Debtors> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: (searchString == null || searchString.trim() == '')
+              stream: (searchString.trim() == '')
                   ? collectionRef.snapshots()
                   : collectionRef
                       .where('Name', isGreaterThanOrEqualTo: searchString)
@@ -112,7 +111,6 @@ class _DebtorsState extends State<Debtors> {
                   padding: const EdgeInsets.all(8.0),
                   child: ListView(
                     children: snapshot.data?.docs.asMap().entries.map((entry) {
-                          int index = entry.key;
                           DocumentSnapshot document = entry.value;
                           Map<String, dynamic> data =
                               document.data() as Map<String, dynamic>;
@@ -131,7 +129,7 @@ class _DebtorsState extends State<Debtors> {
                                       await FirebaseFirestore.instance
                                           .runTransaction((Transaction
                                               myTransaction) async {
-                                        await myTransaction
+                                        myTransaction
                                             .delete(document.reference);
                                       });
                                     },
@@ -257,7 +255,7 @@ class _DebtorsState extends State<Debtors> {
                                       setState(() {
                                         selectedPlayer = newValue;
                                       });
-                                      print("${selectedPlayer}");
+                                      print(selectedPlayer);
                                     },
                                     items: PalyerDropDown.map<
                                             DropdownMenuItem<
@@ -267,9 +265,8 @@ class _DebtorsState extends State<Debtors> {
                                           Map<String, String?>>(
                                         alignment: Alignment.centerRight,
                                         value: value,
-                                        child: Text(value['Name']! +
-                                            ' ' +
-                                            value['Last Name']!),
+                                        child: Text(
+                                            '${value['Name']!} ${value['Last Name']!}'),
                                       );
                                     }).toList(),
                                   ),
@@ -349,7 +346,7 @@ class _DebtorsState extends State<Debtors> {
                                     });
                                   },
                                   style: const ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(
+                                      backgroundColor: WidgetStatePropertyAll(
                                     Color.fromRGBO(255, 180, 0, 1.0),
                                   )),
                                   child: const Text(

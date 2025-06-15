@@ -30,7 +30,6 @@ class _StartState extends State<Start> {
 
   @override
   Widget build(BuildContext context) {
-    double fullScreenHeight = MediaQuery.of(context).size.height;
     double fullScreenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -120,7 +119,7 @@ class _StartState extends State<Start> {
               width: fullScreenWidth - 120,
               child: ElevatedButton(
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(
+                  backgroundColor: WidgetStatePropertyAll(
                     Color.fromRGBO(255, 180, 0, 1.0),
                   ),
                 ),

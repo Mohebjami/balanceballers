@@ -8,14 +8,14 @@
 PRODUCT_NAME = balanceballers
 
 // The application's bundle identifier
-<<<<<<< HEAD
+
 PRODUCT_BUNDLE_IDENTIFIER = com.balanceballers.balanceballers
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2024 com.balanceballers. All rights reserved.
-=======
+
 PRODUCT_BUNDLE_IDENTIFIER = com.example.balanceballers
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.
->>>>>>> 1515bf1 (finaly, fix the register dropdown)
+ 

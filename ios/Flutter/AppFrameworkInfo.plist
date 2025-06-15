@@ -21,10 +21,7 @@
   <key>CFBundleVersion</key>
   <string>1.0</string>
   <key>MinimumOSVersion</key>
-<<<<<<< HEAD
-  <string>11.0</string>
-=======
   <string>12.0</string>
->>>>>>> 1515bf1 (finaly, fix the register dropdown)
+  <string>12.0</string>
 </dict>
 </plist>

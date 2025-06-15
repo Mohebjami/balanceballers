@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'package:balanceballers/PlayerInfo.dart';
+import 'package:balanceballers/player_info.dart';
 import 'package:balanceballers/showAttendance.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart' as pdp;
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 
 class PlayerList extends StatefulWidget {
   @override
@@ -21,6 +20,14 @@ class _PlayerListState extends State<PlayerList> {
   final TextEditingController _searchController = TextEditingController();
   String searchString = '';
   Timer? _dailyTimer;
+  String? _selectedFilterType;
+  final List<String> _typeOptions = [
+    'صبح',
+    'بعد از ظهر',
+    'وی ای پی',
+    'جوانان',
+    'نوجوانان',
+  ];
 
   @override
   void initState() {
@@ -31,11 +38,13 @@ class _PlayerListState extends State<PlayerList> {
   @override
   void dispose() {
     _dailyTimer?.cancel();
+    _searchController.dispose();
     super.dispose();
   }
 
   void _startDailyTimer() {
-    _dailyTimer = Timer.periodic(const Duration(days: 1), (timer) async {
+    _dailyTimer = Timer.periodic(
+      const Duration(days: 1), (timer) async {
       QuerySnapshot snapshot = await playersRef.get();
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -43,13 +52,14 @@ class _PlayerListState extends State<PlayerList> {
         int remainingDays = endDate.difference(DateTime.now()).inDays;
         if (remainingDays > 0) {
           doc.reference.update(
-              {'remainingDays': remainingDays}); // Update 'remainingDays' field
+              {'remainingDays': remainingDays});
         } else {
           await debtorsRef.add(data);
           await doc.reference.delete();
         }
       }
-    });
+    }
+    );
   }
 
   DateTime _convertPersianToDateTime(Map<String, dynamic> persianDate) {
@@ -61,9 +71,8 @@ class _PlayerListState extends State<PlayerList> {
       );
       return jalaliDate.toDateTime();
     } catch (e) {
-      // Handle error and provide a default or log the error
       print('Error converting Persian date: $e');
-      return DateTime.now(); // fallback
+      return DateTime.now();
     }
   }
 
@@ -89,6 +98,85 @@ class _PlayerListState extends State<PlayerList> {
               fontFamily: "TrajanPro",
               fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list_rounded),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setStateDialog) {
+                      return AlertDialog(
+                        title: const Text("فیلتر بر اساس رده سنی"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color.fromRGBO(255, 180, 0, 1.0),
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: DropdownButton<String>(
+                                isExpanded: true,
+                                value: _selectedFilterType,
+                                hint: const Text('انتخاب رده سنی'),
+                                icon: const Icon(Icons.arrow_drop_down),
+                                iconSize: 24,
+                                elevation: 16,
+                                underline: Container(),
+                                onChanged: (String? newValue) {
+                                  setStateDialog(() {
+                                    _selectedFilterType = newValue;
+                                  });
+                                },
+                                items: _typeOptions
+                                    .map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ElevatedButton(
+                                  child: const Text('حذف فیلتر'),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedFilterType = null;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                ElevatedButton(
+                                  child: const Text('اعمال فیلتر'),
+                                  onPressed: () {
+                                    setState(() {
+                                      // _selectedFilterType is already updated
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ],
         backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
         foregroundColor: Colors.white,
       ),
@@ -113,12 +201,36 @@ class _PlayerListState extends State<PlayerList> {
               ),
             ),
           ),
+          if (_selectedFilterType != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'فیلتر: $_selectedFilterType',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        _selectedFilterType = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: (searchString == null || searchString.trim() == '')
+              stream: (searchString.trim() == '' && _selectedFilterType == null)
                   ? playersRef.snapshots()
-                  : playersRef.orderBy('Name').startAt([searchString]).endAt(
-                      [searchString + '\uf8ff']).snapshots(),
+                  : playersRef.snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -130,10 +242,25 @@ class _PlayerListState extends State<PlayerList> {
                   );
                 }
 
+                // Filter and process the data
+                List<DocumentSnapshot> filteredDocs = snapshot.data!.docs.where((doc) {
+                  Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                  
+                  // Apply search filter
+                  bool matchesSearch = searchString.trim() == '' ||
+                      data['Name'].toString().toLowerCase().contains(searchString) ||
+                      data['Last Name'].toString().toLowerCase().contains(searchString);
+                  
+                  // Apply type filter if selected
+                  bool matchesType = _selectedFilterType == null ||
+                      data['Type'] == _selectedFilterType;
+                  
+                  return matchesSearch && matchesType;
+                }).toList();
+
                 // Store the player documents in a list and calculate remainingDays
-                List<DocumentSnapshot> playerDocs = snapshot.data?.docs ?? [];
                 List<Map<String, dynamic>> playersWithRemainingDays =
-                    playerDocs.map((doc) {
+                    filteredDocs.map((doc) {
                   Map<String, dynamic> data =
                       doc.data() as Map<String, dynamic>;
                   DateTime endDate =
@@ -146,7 +273,6 @@ class _PlayerListState extends State<PlayerList> {
                   };
                 }).toList();
 
-                // Sort the list by remainingDays in ascending order
                 // Sort the list by registration date (earliest registered players first)
                 playersWithRemainingDays.sort((a, b) {
                   DateTime dateA = _convertPersianToDateTime(a['data']['Date']);
