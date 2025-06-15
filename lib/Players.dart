@@ -25,8 +25,10 @@ class _PlayerListState extends State<PlayerList> {
     'صبح',
     'بعد از ظهر',
     'وی ای پی',
+    'وی ای پی پیروزی',
     'جوانان',
     'نوجوانان',
+    'نونهالان',
   ];
 
   @override
@@ -43,23 +45,20 @@ class _PlayerListState extends State<PlayerList> {
   }
 
   void _startDailyTimer() {
-    _dailyTimer = Timer.periodic(
-      const Duration(days: 1), (timer) async {
+    _dailyTimer = Timer.periodic(const Duration(days: 1), (timer) async {
       QuerySnapshot snapshot = await playersRef.get();
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         DateTime endDate = _convertPersianToDateTime(data['End Date']);
         int remainingDays = endDate.difference(DateTime.now()).inDays;
         if (remainingDays > 0) {
-          doc.reference.update(
-              {'remainingDays': remainingDays});
+          doc.reference.update({'remainingDays': remainingDays});
         } else {
           await debtorsRef.add(data);
           await doc.reference.delete();
         }
       }
-    }
-    );
+    });
   }
 
   DateTime _convertPersianToDateTime(Map<String, dynamic> persianDate) {
@@ -106,7 +105,8 @@ class _PlayerListState extends State<PlayerList> {
                 context: context,
                 builder: (BuildContext context) {
                   return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setStateDialog) {
+                    builder:
+                        (BuildContext context, StateSetter setStateDialog) {
                       return AlertDialog(
                         title: const Text("فیلتر بر اساس رده سنی"),
                         content: Column(
@@ -120,7 +120,8 @@ class _PlayerListState extends State<PlayerList> {
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: _selectedFilterType,
@@ -135,7 +136,8 @@ class _PlayerListState extends State<PlayerList> {
                                   });
                                 },
                                 items: _typeOptions
-                                    .map<DropdownMenuItem<String>>((String value) {
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -243,18 +245,26 @@ class _PlayerListState extends State<PlayerList> {
                 }
 
                 // Filter and process the data
-                List<DocumentSnapshot> filteredDocs = snapshot.data!.docs.where((doc) {
-                  Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-                  
+                List<DocumentSnapshot> filteredDocs =
+                    snapshot.data!.docs.where((doc) {
+                  Map<String, dynamic> data =
+                      doc.data() as Map<String, dynamic>;
+
                   // Apply search filter
                   bool matchesSearch = searchString.trim() == '' ||
-                      data['Name'].toString().toLowerCase().contains(searchString) ||
-                      data['Last Name'].toString().toLowerCase().contains(searchString);
-                  
+                      data['Name']
+                          .toString()
+                          .toLowerCase()
+                          .contains(searchString) ||
+                      data['Last Name']
+                          .toString()
+                          .toLowerCase()
+                          .contains(searchString);
+
                   // Apply type filter if selected
                   bool matchesType = _selectedFilterType == null ||
                       data['Type'] == _selectedFilterType;
-                  
+
                   return matchesSearch && matchesType;
                 }).toList();
 

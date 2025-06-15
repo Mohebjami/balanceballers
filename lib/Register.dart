@@ -105,8 +105,10 @@ class _RegisterState extends State<Register> {
                     'صبح',
                     'بعد از ظهر',
                     'وی ای پی',
+                    'وی ای پی پیروزی',
                     'جوانان',
                     'نوجوانان',
+                    'نونهالان',
                   ].map((type) {
                     return DropdownMenuItem<String>(
                       value: type,

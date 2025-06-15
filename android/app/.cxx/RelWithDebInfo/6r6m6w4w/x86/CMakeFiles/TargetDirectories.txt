@@ -1,0 +1,2 @@
+/Users/mohebjami/Desktop/Development/balanceballers/android/app/.cxx/RelWithDebInfo/6r6m6w4w/x86/CMakeFiles/edit_cache.dir
+/Users/mohebjami/Desktop/Development/balanceballers/android/app/.cxx/RelWithDebInfo/6r6m6w4w/x86/CMakeFiles/rebuild_cache.dir

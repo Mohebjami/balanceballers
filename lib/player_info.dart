@@ -28,8 +28,10 @@ class _PlayerInfoState extends State<PlayerInfo> {
     'صبح',
     'بعد از ظهر',
     'وی ای پی',
+    'وی ای پی پیروزی',
     'جوانان',
     'نوجوانان',
+    'نونهالان',
   ];
   String? _selectedType;
 
