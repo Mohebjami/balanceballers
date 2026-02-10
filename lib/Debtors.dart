@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:balanceballers/player_info.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,169 +12,228 @@ class Debtors extends StatefulWidget {
 class _DebtorsState extends State<Debtors> {
   final CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('Debtors');
+
+  final TextEditingController _searchController = TextEditingController();
   String searchString = '';
 
-  TextEditingController Dept = TextEditingController();
-
-  Color coYellow = const Color.fromRGBO(255, 180, 0, 1.0);
-  bool _isLightTheme = false; // Declare _isLightTheme
-
-  // ignore: unnecessary_getters_setters
-  bool get isLightTheme => _isLightTheme; // Getter for _isLightTheme
-
-  set isLightTheme(bool value) {
-    _isLightTheme = value;
-  }
-
+  // Dropdown & Add Debt
   Map<String, String?>? selectedPlayer;
+  List<Map<String, String?>> playerDropDown = [];
+  final TextEditingController debtController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchWaitingData();
+    fetchPlayers();
   }
 
-  List<Map<String, String?>> PalyerDropDown = [];
-
-  Future<List<Map<String, String?>>> showPlayersDropDownDebt() async {
-    final CollectionReference collectionReference =
-        FirebaseFirestore.instance.collection('players');
-    var snapshots = await collectionReference.get();
-    return snapshots.docs
-        .map((doc) {
-          var data = doc.data() as Map<String, dynamic>;
-          return {
-            'Name': data['Name'] as String?,
-            'Last Name': data['Last Name'] as String?,
-          };
-        })
-        .where((item) => item['Name'] != null && item['Last Name'] != null)
-        .toList();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    debtController.dispose();
+    super.dispose();
   }
 
-  Future<void> fetchWaitingData() async {
-    PalyerDropDown = await showPlayersDropDownDebt();
+  Future<void> fetchPlayers() async {
+    final snapshots =
+        await FirebaseFirestore.instance.collection('players').get();
+    playerDropDown = snapshots.docs.map((doc) {
+      var data = doc.data() as Map<String, dynamic>;
+      return {
+        'Name': data['Name'] as String?,
+        'Last Name': data['Last Name'] as String?,
+      };
+    }).toList();
     setState(() {});
+  }
+
+  Widget _glassContainer({required Widget child, EdgeInsets? padding}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: padding ?? const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.06),
+            blurRadius: 2,
+            offset: const Offset(1, 1),
+          )
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildMeshBackground(bool isDark) {
+    return Positioned.fill(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF020617)]
+                : [Colors.white, Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     double fullScreenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           "قرض دار ها",
           style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontFamily: "TrajanPro",
-              fontWeight: FontWeight.bold),
+            fontFamily: "TrajanPro",
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
-        backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: isDark ? Colors.white : Colors.black,
       ),
-      body: Column(
+      body: Stack(
         children: [
+          _buildMeshBackground(isDark),
+
+          // Search Field
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: "جستجو",
-                hintText: "جستجو",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                ),
+            padding: const EdgeInsets.all(12.0),
+            child: _glassContainer(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: Colors.white70),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          searchString = value.toLowerCase();
+                        });
+                      },
+                      style:
+                          TextStyle(color: isDark ? Colors.white : Colors.black),
+                      decoration: InputDecoration(
+                        hintText: "...جستجو",
+                        hintStyle: TextStyle(
+                            color: isDark ? Colors.white : Colors.black),
+                        border: InputBorder.none,
+                        isDense: true,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Expanded(
+
+          // Debtors List
+          Padding(
+            padding: const EdgeInsets.only(top: 80),
             child: StreamBuilder<QuerySnapshot>(
               stream: (searchString.trim() == '')
                   ? collectionRef.snapshots()
                   : collectionRef
                       .where('Name', isGreaterThanOrEqualTo: searchString)
                       .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return const Text('Something went wrong');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView(
-                    children: snapshot.data?.docs.asMap().entries.map((entry) {
-                          DocumentSnapshot document = entry.value;
-                          Map<String, dynamic> data =
-                              document.data() as Map<String, dynamic>;
-                          return Card(
-                            color: coYellow,
-                            child: Slidable(
-                              closeOnScroll: true,
-                              startActionPane: ActionPane(
-                                motion: const StretchMotion(),
-                                children: [
-                                  SlidableAction(
-                                    backgroundColor: Colors.red,
-                                    icon: Icons.delete_forever,
-                                    label: 'حذف',
-                                    onPressed: (context) async {
-                                      await FirebaseFirestore.instance
-                                          .runTransaction((Transaction
-                                              myTransaction) async {
-                                        myTransaction
-                                            .delete(document.reference);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: Text(
-                                  data['Name'],
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                leading: const CircleAvatar(
-                                  backgroundColor: Colors.transparent,
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                trailing: Text(
-                                  data['Debt'].toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                subtitle: Text(
-                                  data['Last Name'],
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          PlayerInfo(data: data),
-                                    ),
-                                  );
+
+                List<DocumentSnapshot> docs = snapshot.data!.docs;
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: docs.length,
+                  itemBuilder: (_, index) {
+                    var doc = docs[index];
+                    Map<String, dynamic> data =
+                        doc.data() as Map<String, dynamic>;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14.0),
+                      child: _glassContainer(
+                        padding: const EdgeInsets.all(8),
+                        child: Slidable(
+                          closeOnScroll: true,
+                          startActionPane: ActionPane(
+                            motion: const StretchMotion(),
+                            children: [
+                              SlidableAction(
+                                backgroundColor: Colors.red.shade600,
+                                foregroundColor: Colors.white,
+                                icon: Icons.delete_forever_rounded,
+                                label: 'حذف',
+                                borderRadius: BorderRadius.circular(16),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 8),
+                                onPressed: (context) async {
+                                  await doc.reference.delete();
                                 },
                               ),
+                            ],
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            title: Text(
+                              "${data['Name']} ${data['Last Name']}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          );
-                        }).toList() ??
-                        [],
-                  ),
+                            subtitle: Text(
+                              "قرض: ${data['Debt']}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 14),
+                            ),
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.red.shade400,
+                              child: Text(
+                                data['Debt'].toString(),
+                                style: TextStyle(
+                                    color: isDark ? Colors.black : Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PlayerInfo(data: data),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -181,198 +241,127 @@ class _DebtorsState extends State<Debtors> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
+          // Add debt dialog
           showDialog(
-              context: context,
-              builder: (BuildContextcontext) {
-                return AlertDialog(
-                  backgroundColor: _isLightTheme
-                      ? const Color.fromRGBO(10, 23, 42, 1)
-                      : const Color.fromRGBO(255, 255, 240, 1),
-                  content: SizedBox(
-                    width: double.maxFinite,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextField(
-                                controller: Dept,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 2)),
-                                  hintText: "قرض",
-                                  hintStyle: TextStyle(color: Colors.black),
-                                ),
-                                textAlign: TextAlign.right,
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromRGBO(255, 180, 0, 1.0),
-                                    borderRadius: BorderRadius.circular(20.0)),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0,
-                                      right: 8.0,
-                                      bottom: 5.0,
-                                      top: 5.0),
-                                  child: DropdownButton<Map<String, String?>>(
-                                    value: selectedPlayer,
-                                    hint: const Center(
-                                      child: Text(
-                                        "انتخاب بازیکن",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                                    ),
-                                    focusColor: Colors.white,
-                                    iconEnabledColor: Colors.white,
-                                    isExpanded: true,
-                                    icon: const Icon(
-                                      Icons.arrow_downward,
-                                      color: Colors.white,
-                                    ),
-                                    iconSize: 24,
-                                    elevation: 16,
-                                    style: const TextStyle(color: Colors.white),
-                                    dropdownColor:
-                                        const Color.fromRGBO(255, 180, 0, 1.0),
-                                    underline: Container(
-                                      color: Colors.transparent,
-                                    ),
-                                    onChanged:
-                                        (Map<String, String?>? newValue) {
-                                      setState(() {
-                                        selectedPlayer = newValue;
-                                      });
-                                      print(selectedPlayer);
-                                    },
-                                    items: PalyerDropDown.map<
-                                            DropdownMenuItem<
-                                                Map<String, String?>>>(
-                                        (Map<String, String?> value) {
-                                      return DropdownMenuItem<
-                                          Map<String, String?>>(
-                                        alignment: Alignment.centerRight,
-                                        value: value,
-                                        child: Text(
-                                            '${value['Name']!} ${value['Last Name']!}'),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              SizedBox(
-                                height: 50,
-                                width: fullScreenWidth,
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    int dbt = int.parse(Dept.text);
-                                    CollectionReference collRef =
-                                        FirebaseFirestore.instance
-                                            .collection('Debtors');
-                                    // First, check if the data already exists in the Debtors table
-                                    Query query = collRef
-                                        .where('Name',
-                                            isEqualTo: selectedPlayer?['Name'])
-                                        .where('Last Name',
-                                            isEqualTo:
-                                                selectedPlayer?['Last Name']);
-                                    query.get().then((querySnapshot) async {
-                                      if (querySnapshot.docs.isNotEmpty) {
-                                        // If the data exists, just update the Debt column
-                                        for (var doc in querySnapshot.docs) {
-                                          DocumentReference docRef =
-                                              doc.reference;
-                                          await docRef.update({'Debt': dbt});
-                                          Navigator.of(context).pop();
-                                        }
-                                      } else {
-                                        // If the data does not exist, insert the data and update the Players table
-                                        await collRef.add({
-                                          'Name': selectedPlayer?['Name'],
-                                          'Last Name':
-                                              selectedPlayer?['Last Name'],
-                                          'Debt': dbt,
-                                        }).then((value) async {
-                                          Query query = FirebaseFirestore
-                                              .instance
-                                              .collection('players')
-                                              .where('Name',
-                                                  isEqualTo:
-                                                      selectedPlayer?['Name'])
-                                              .where('Last Name',
-                                                  isEqualTo: selectedPlayer?[
-                                                      'Last Name']);
-                                          query
-                                              .get()
-                                              .then((querySnapshot) async {
-                                            if (querySnapshot.docs.isNotEmpty) {
-                                              for (var doc
-                                                  in querySnapshot.docs) {
-                                                DocumentReference docRef =
-                                                    doc.reference;
-                                                await docRef
-                                                    .update({'Debt': dbt});
-                                                Navigator.of(context).pop();
-                                              }
-                                            } else {
-                                              print("No such document!");
-                                            }
-                                          }).catchError((error) {
-                                            print(
-                                                "Error getting document: $error");
-                                          });
-                                        }).catchError((error) {
-                                          print(
-                                              "Failed to update user: $error");
-                                        });
-                                      }
-                                    }).catchError((error) {
-                                      print("Error getting document: $error");
-                                    });
-                                  },
-                                  style: const ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll(
-                                    Color.fromRGBO(255, 180, 0, 1.0),
-                                  )),
-                                  child: const Text(
-                                    "ذخیره",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontFamily: "TrajanPro",
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ],
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                backgroundColor:
+                    isDark ? const Color(0xFF0F172A) : Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18)),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: debtController,
+                        style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black),
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "قرض",
+                          hintStyle: TextStyle(
+                              color: isDark ? Colors.white : Colors.black),
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: DropdownButton<Map<String, String?>>(
+                          value: selectedPlayer,
+                          hint: const Center(
+                            child: Text(
+                              "انتخاب بازیکن",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          isExpanded: true,
+                          dropdownColor: Colors.orange.shade600,
+                          underline: Container(color: Colors.transparent),
+                          icon: const Icon(Icons.arrow_downward,
+                              color: Colors.white),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedPlayer = value;
+                            });
+                          },
+                          items: playerDropDown
+                              .map((player) => DropdownMenuItem(
+                                    alignment: Alignment.centerRight,
+                                    value: player,
+                                    child: Text(
+                                        "${player['Name']} ${player['Last Name']}"),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 50,
+                        width: fullScreenWidth,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (selectedPlayer != null &&
+                                debtController.text.isNotEmpty) {
+                              int dbt = int.parse(debtController.text);
+
+                              // Update or add debtor
+                              final collRef =
+                                  FirebaseFirestore.instance.collection('Debtors');
+                              Query query = collRef
+                                  .where('Name',
+                                      isEqualTo: selectedPlayer?['Name'])
+                                  .where('Last Name',
+                                      isEqualTo: selectedPlayer?['Last Name']);
+
+                              final querySnapshot = await query.get();
+                              if (querySnapshot.docs.isNotEmpty) {
+                                for (var doc in querySnapshot.docs) {
+                                  await doc.reference.update({'Debt': dbt});
+                                }
+                              } else {
+                                await collRef.add({
+                                  'Name': selectedPlayer?['Name'],
+                                  'Last Name': selectedPlayer?['Last Name'],
+                                  'Debt': dbt,
+                                });
+                              }
+                              debtController.clear();
+                              selectedPlayer = null;
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueAccent),
+                          child: const Text(
+                            "ذخیره",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
                           ),
                         ),
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                );
-              });
+                ),
+              );
+            },
+          );
         },
-        backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
       ),
     );
   }

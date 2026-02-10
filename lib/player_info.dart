@@ -38,28 +38,20 @@ class _PlayerInfoState extends State<PlayerInfo> {
   @override
   void initState() {
     super.initState();
-    // Initialize with current value
     _selectedType = widget.data['Type'];
   }
 
   TextEditingController nameController = TextEditingController();
-
   TextEditingController lastController = TextEditingController();
-
   TextEditingController feeController = TextEditingController();
-
   TextEditingController periodController = TextEditingController();
-
   TextEditingController debtorController = TextEditingController();
 
   String dropdownValue = 'Week';
-
   Jalali? _selectedDate;
-
   final bool _isLightTheme = false;
-// Theme state
   String? _selectedPeriod = 'Week';
-// Default period
+
   Future<void> _selectDate(BuildContext context) async {
     final Jalali? picked = await showPersianDatePicker(
       context: context,
@@ -69,7 +61,6 @@ class _PlayerInfoState extends State<PlayerInfo> {
     );
     if (picked != null && picked != _selectedDate) {
       _selectedDate = picked;
-// Show period selection dialog
       _showPeriodSelectionDialog(context);
     }
   }
@@ -93,9 +84,11 @@ class _PlayerInfoState extends State<PlayerInfo> {
                         ? 'Selected Date: ${_formatJalaliDate(_selectedDate)}'
                         : 'Select Date',
                   ),
+                  const SizedBox(height: 10),
                   Container(
                     width: 250,
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -125,13 +118,17 @@ class _PlayerInfoState extends State<PlayerInfo> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: periodController,
-                    decoration: const InputDecoration(
-                      border:
-                          OutlineInputBorder(borderSide: BorderSide(width: 2)),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(width: 2),
+                      ),
                       hintText: "مدت ثبت نام",
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
                     ),
                     textAlign: TextAlign.right,
                     keyboardType: TextInputType.number,
@@ -141,43 +138,37 @@ class _PlayerInfoState extends State<PlayerInfo> {
               actions: <Widget>[
                 TextButton(
                   child: const Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
+                  ),
                   child: const Text('Save'),
-// Inside your onPressed function in the save button
-
                   onPressed: () async {
                     if (_selectedDate != null &&
                         periodController.text.isNotEmpty) {
                       int periods = int.tryParse(periodController.text) ?? 1;
 
-// Update the start date in Firestore
                       _updatePlayerInfo('Date', {
                         'year': _selectedDate!.year,
                         'month': _selectedDate!.month,
                         'day': _selectedDate!.day,
                       });
 
-// Initialize endDate with the selected date
                       Jalali endDate = _selectedDate!;
-
-// Calculate the end date based on the selected period
                       if (dropdownValue == 'Week') {
                         endDate = _selectedDate!.addDays(periods * 7);
                       } else {
                         endDate = _selectedDate!.addDays(periods * 30);
                       }
 
-// Update the end date in Firestore
                       _updatePlayerInfo('End Date', {
                         'year': endDate.year,
                         'month': endDate.month,
                         'day': endDate.day,
                       });
-// Retrieve the player's documentId from Firestore using name and last name
+
                       QuerySnapshot playerSnapshot = await FirebaseFirestore
                           .instance
                           .collection('players')
@@ -187,22 +178,16 @@ class _PlayerInfoState extends State<PlayerInfo> {
                           .get();
 
                       if (playerSnapshot.docs.isNotEmpty) {
-// Assuming there is only one document with this name and last name
                         String documentId = playerSnapshot.docs.first.id;
-
-// Now you can update the Period using this documentId
                         CollectionReference collection =
                             FirebaseFirestore.instance.collection('players');
                         try {
                           await collection.doc(documentId).update({
                             'Period': periods,
                           });
-                          print('Period updated successfully');
                         } catch (e) {
                           print('Failed to update Period: $e');
                         }
-                      } else {
-                        print('Error: Player not found');
                       }
                       Navigator.of(context).pop();
                     } else {
@@ -240,189 +225,44 @@ class _PlayerInfoState extends State<PlayerInfo> {
           ),
         ),
         backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
-        foregroundColor: Colors.white,
       ),
       body: SizedBox(
         height: fullScreenHeight,
         width: fullScreenWidth,
         child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 20),
           children: [
-            const SizedBox(height: 50),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    _showUpdateDialog(context, 'نام', nameController, 'Name',
-                        widget.data['Name']);
-                  },
-                  child:
-                      buildPlayerInfoBox(context, 'نام', widget.data['Name']),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    _showUpdateDialog(context, 'فامیلی', lastController,
-                        'Last Name', widget.data['Last Name']);
-                  },
-                  child: buildPlayerInfoBox(
-                      context, 'فامیلی', widget.data['Last Name']),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (
-                        BuildContext context,
-                      ) {
-                        return StatefulBuilder(builder:
-                            (BuildContext context, StateSetter setStateDialog) {
-                          return AlertDialog(
-                            backgroundColor: _isLightTheme
-                                ? const Color.fromRGBO(10, 23, 42, 1)
-                                : const Color.fromRGBO(255, 255, 240, 1),
-                            title: const Text('انتخاب رده سنی'),
-                            content: Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.white
-                                      : const Color(0xFF1E1E2C),
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                  border: Border.all(
-                                    color:
-                                        const Color.fromRGBO(255, 180, 0, 1.0),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 4),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    isExpanded: true,
-                                    dropdownColor:
-                                        Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Colors.white
-                                            : const Color(0xFF1E1E2C),
-                                    value: _selectedType,
-                                    icon: const Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        color: Color.fromRGBO(255, 180, 0, 1.0),
-                                        size: 28),
-                                    elevation: 12,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? Colors.black87
-                                          : Colors.white,
-                                    ),
-                                    hint: const Text(
-                                      'انتخاب رده سنی',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    onChanged: (String? newValue) {
-                                      setStateDialog(() {
-                                        _selectedType = newValue;
-                                      });
-                                    },
-                                    items: _typeOptions.map((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(
-                                          value,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('لغو'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              ElevatedButton(
-                                child: const Text('ثبت'),
-                                onPressed: () {
-                                  if (_selectedType != null) {
-                                    _updatePlayerInfo('Type', _selectedType);
-                                    Navigator.of(context).pop();
-                                  } else {
-                                    print("Error: No type selected");
-                                  }
-                                },
-                              ),
-                            ],
-                          );
-                        });
-                      },
-                    );
-                  },
-                  child: buildPlayerInfoBox(
-                      context, 'رده سنی', widget.data['Type'] ?? 'نامشخص'),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    _showUpdateDialog(context, 'فیس', lastController, 'Fee',
-                        widget.data['Fee']);
-                  },
-                  child: buildPlayerInfoBox(
-                      context, 'فیس', widget.data['Fee']?.toString() ?? '0'),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    _showUpdateDialog(context, 'قرض', debtorController, 'Debt',
-                        widget.data['Debt'].toString(),
-                        isNumeric: true);
-                  },
-                  child: buildPlayerInfoBox(
-                      context, 'قرض', widget.data['Debt'].toString()),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    _selectDate(context);
-                  },
-                  child: buildPlayerInfoBox(
+              children: [
+                buildInteractiveBox(
+                    context, 'نام', widget.data['Name'], nameController, 'Name'),
+                const SizedBox(height: 16),
+                buildInteractiveBox(context, 'فامیلی', widget.data['Last Name'],
+                    lastController, 'Last Name'),
+                const SizedBox(height: 16),
+                buildTypeSelector(context),
+                const SizedBox(height: 16),
+                buildInteractiveBox(
                     context,
-                    'تاریخ ثبت نام',
-                    _selectedDate != null
-                        ? _formatJalaliDate(_selectedDate)
-                        : _formatDate(widget.data['Date']),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-// Optional: Add functionality for end date selection if needed
-                  },
-                  child: buildPlayerInfoBox(
+                    'فیس',
+                    widget.data['Fee']?.toString() ?? '0',
+                    feeController,
+                    'Fee'),
+                const SizedBox(height: 16),
+                buildInteractiveBox(
                     context,
-                    'تاریخ پایان',
-                    _formatDate(widget.data['End Date']),
-                  ),
-                ),
+                    'قرض',
+                    widget.data['Debt'].toString(),
+                    debtorController,
+                    'Debt',
+                    isNumeric: true),
+                const SizedBox(height: 16),
+                buildDateSelector(context, 'تاریخ ثبت نام', _selectedDate,
+                    widget.data['Date']),
+                const SizedBox(height: 16),
+                buildDateDisplay(
+                    context, 'تاریخ پایان', widget.data['End Date']),
                 const SizedBox(height: 20),
                 if (widget.data.containsKey('userId') &&
                     widget.data['userId'] != null)
@@ -431,7 +271,10 @@ class _PlayerInfoState extends State<PlayerInfo> {
                     builder:
                         (BuildContext context, AsyncSnapshot<int> snapshot) {
                       if (snapshot.hasData) {
-                        return Text('Present Count: ${snapshot.data}');
+                        return Text(
+                          'Present Count: ${snapshot.data}',
+                          style: const TextStyle(fontSize: 18),
+                        );
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
@@ -445,7 +288,10 @@ class _PlayerInfoState extends State<PlayerInfo> {
                     builder:
                         (BuildContext context, AsyncSnapshot<int> snapshot) {
                       if (snapshot.hasData) {
-                        return Text('Absent Count: ${snapshot.data}');
+                        return Text(
+                          'Absent Count: ${snapshot.data}',
+                          style: const TextStyle(fontSize: 18),
+                        );
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
@@ -460,6 +306,147 @@ class _PlayerInfoState extends State<PlayerInfo> {
     );
   }
 
+  // --- UI helpers ---
+  Widget buildInteractiveBox(BuildContext context, String label, String value,
+      TextEditingController controller, String field,
+      {bool isNumeric = false}) {
+    return GestureDetector(
+      onTap: () {
+        _showUpdateDialog(context, label, controller, field, value,
+            isNumeric: isNumeric);
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(255, 180, 0, 1.0),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white)),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontSize: 17, color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildTypeSelector(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setStateDialog) {
+                return AlertDialog(
+                  backgroundColor: _isLightTheme
+                      ? const Color.fromRGBO(10, 23, 42, 1)
+                      : const Color.fromRGBO(255, 255, 240, 1),
+                  title: const Text('انتخاب رده سنی'),
+                  content: DropdownButton<String>(
+                    isExpanded: true,
+                    value: _selectedType,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    elevation: 16,
+                    onChanged: (String? newValue) {
+                      setStateDialog(() {
+                        _selectedType = newValue;
+                      });
+                    },
+                    items: _typeOptions.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('لغو')),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (_selectedType != null) {
+                            _updatePlayerInfo('Type', _selectedType);
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('ثبت')),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(255, 180, 0, 1.0),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('رده سنی',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+            Flexible(
+              child: Text(_selectedType ?? 'نامشخص',
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(fontSize: 17, color: Colors.white70)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildDateSelector(BuildContext context, String label, Jalali? date,
+      Map<String, dynamic>? dateMap) {
+    return GestureDetector(
+      onTap: () {
+        _selectDate(context);
+      },
+      child: buildInteractiveBox(
+          context, label, date != null ? _formatJalaliDate(date) : _formatDate(dateMap),
+          TextEditingController(), 'Date'),
+    );
+  }
+
+  Widget buildDateDisplay(
+      BuildContext context, String label, Map<String, dynamic>? dateMap) {
+    return buildInteractiveBox(context, label, _formatDate(dateMap),
+        TextEditingController(), 'End Date');
+  }
+
   String _formatDate(Map<String, dynamic>? dateMap) {
     if (dateMap == null) return 'No Date';
     DateTime date = DateTime(
@@ -470,55 +457,10 @@ class _PlayerInfoState extends State<PlayerInfo> {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
-  Widget buildPlayerInfoBox(BuildContext context, String label, String value) {
-    return Stack(
-      children: [
-        Center(
-          child: Container(
-            width: 300,
-            height: 60,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: const Color.fromRGBO(255, 180, 0, 1.0),
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(30)),
-            ),
-            child: Center(
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 20, fontFamily: 'LilitaOne'),
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 50),
-          child: Center(
-            child: Container(
-              width: 290,
-              height: 60,
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(255, 180, 0, 1.0),
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-              ),
-              child: Center(
-                child: Text(
-                  value,
-                  style: const TextStyle(fontSize: 23),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showUpdateDialog(BuildContext context, String title,
       TextEditingController controller, String field, String initialValue,
       {bool isNumeric = false}) {
     if (field == 'Date') {
-// Initialize the _selectedDate with the existing date from data if available
       if (widget.data['Date'] != null) {
         _selectedDate = Jalali(
           widget.data['Date']['year'],
@@ -632,43 +574,34 @@ class _PlayerInfoState extends State<PlayerInfo> {
     String name = widget.data['Name'];
     String lastName = widget.data['Last Name'];
 
-// Query to find the player in the players collection
     Query playerQuery = FirebaseFirestore.instance
         .collection('players')
         .where('Name', isEqualTo: name)
         .where('Last Name', isEqualTo: lastName);
 
-// Query to find the player in the Debtors collection
     Query debtorQuery = FirebaseFirestore.instance
         .collection('Debtors')
         .where('Name', isEqualTo: name)
         .where('Last Name', isEqualTo: lastName);
 
     try {
-// Update player info in 'players' collection
       QuerySnapshot playerSnapshot = await playerQuery.get();
-      if (playerSnapshot.docs.isNotEmpty) {
+           if (playerSnapshot.docs.isNotEmpty) {
         for (var doc in playerSnapshot.docs) {
           DocumentReference docRef = doc.reference;
 
-// If updating the 'Debt' field
           if (field == 'Debt') {
-            int debtValue = int.tryParse(value) ?? 0; // Convert value to int
+            int debtValue = int.tryParse(value.toString()) ?? 0;
             await docRef.update({field: debtValue});
 
-// Handle updating 'Debtors' collection
             if (debtValue > 0) {
-// Check if player exists in 'Debtors'
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
-// Player exists in 'Debtors', update the debt
                 for (var debtorDoc in debtorSnapshot.docs) {
-                  DocumentReference debtorDocRef = debtorDoc.reference;
-                  await debtorDocRef.update({'Debt': debtValue});
+                  await debtorDoc.reference.update({'Debt': debtValue});
                   print("Player's debt updated in Debtors: $debtValue");
                 }
               } else {
-// Player does not exist in 'Debtors', add them
                 await FirebaseFirestore.instance.collection('Debtors').add({
                   'Name': name,
                   'Last Name': lastName,
@@ -677,7 +610,6 @@ class _PlayerInfoState extends State<PlayerInfo> {
                 print("Player added to Debtors with debt: $debtValue");
               }
             } else {
-// Remove player from 'Debtors' if debt is 0 or less
               QuerySnapshot debtorSnapshot = await debtorQuery.get();
               if (debtorSnapshot.docs.isNotEmpty) {
                 for (var debtorDoc in debtorSnapshot.docs) {
@@ -686,13 +618,11 @@ class _PlayerInfoState extends State<PlayerInfo> {
                 }
               }
             }
-          } else if (field == 'Date') {
-// Ensure value is a Map for date fields
+          } else if (field == 'Date' || field == 'End Date') {
             if (value is Map<String, dynamic>) {
               await docRef.update({field: value});
             } else {
-              print(
-                  "Error: Value for Date field is not a Map<String, dynamic>");
+              print("Error: Value for $field is not a Map<String, dynamic>");
             }
           } else {
             await docRef.update({field: value});
@@ -706,5 +636,49 @@ class _PlayerInfoState extends State<PlayerInfo> {
     } catch (error) {
       print("Error updating document: $error");
     }
+  }
+
+  Widget buildPlayerInfoBox(BuildContext context, String label, String value) {
+    return Stack(
+      children: [
+        Center(
+          child: Container(
+            width: 300,
+            height: 60,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color.fromRGBO(255, 180, 0, 1.0),
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 20, fontFamily: 'LilitaOne'),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 50),
+          child: Center(
+            child: Container(
+              width: 290,
+              height: 60,
+              decoration: const BoxDecoration(
+                color: Color.fromRGBO(255, 180, 0, 1.0),
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+              child: Center(
+                child: Text(
+                  value,
+                  style: const TextStyle(fontSize: 23),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

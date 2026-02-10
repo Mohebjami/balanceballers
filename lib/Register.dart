@@ -1,8 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart' as pdp;
 
 class Register extends StatefulWidget {
@@ -13,15 +10,20 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController lastController = TextEditingController();
-  TextEditingController feeController = TextEditingController();
-  TextEditingController typeController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
-  TextEditingController periodController = TextEditingController(text: "1");
-  TextEditingController debtorController = TextEditingController();
+  // Controllers
+  final nameController = TextEditingController();
+  final lastController = TextEditingController();
+  final feeController = TextEditingController();
+  final typeController = TextEditingController();
+  final periodController = TextEditingController(text: "1");
+  final debtorController = TextEditingController(text: "0");
+
   String dropdownValue = 'Month';
   DateTime? _selectedDate;
+  static const Color trophyGold = Color(0xFFF59E0B);
 
   Future<void> _selectDate(BuildContext context) async {
     final pdp.Jalali? picked = await pdp.showPersianDatePicker(
@@ -30,378 +32,302 @@ class _RegisterState extends State<Register> {
       firstDate: pdp.Jalali(1403, 1),
       lastDate: pdp.Jalali(1429),
     );
-    // ignore: unrelated_type_equality_checks
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked.toDateTime();
-        DateFormat('yyyy-MM-dd').format(_selectedDate!);
-      });
-    }
+    if (picked != null) setState(() => _selectedDate = picked.toDateTime());
   }
 
   @override
   Widget build(BuildContext context) {
-    double fullScreenHeight = MediaQuery.of(context).size.height;
-    double fullScreenWidth = MediaQuery.of(context).size.width;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(255, 180, 0, 1.0),
-        foregroundColor: Colors.white,
-        elevation: 0.0,
-        title: const Text(
-          'ثبت نام',
-          style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontFamily: "TrajanPro",
-              fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          height: fullScreenHeight,
-          width: fullScreenWidth,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            image: AssetImage(Theme.of(context).brightness == Brightness.light
-                ? "assets/pic/backgroundRL.jpg"
-                : "assets/pic/backgroundRD.jpg"),
-            fit: BoxFit.cover,
-          )),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "نام",
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                TextField(
-                  controller: lastController,
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "فامیلی",
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                DropdownButtonFormField<String>(
-                  value: typeController.text.isNotEmpty
-                      ? typeController.text
-                      : null,
-                  items: [
-                    'صبح',
-                    'بعد از ظهر',
-                    'وی ای پی',
-                    'وی ای پی پیروزی',
-                    'جوانان',
-                    'نوجوانان',
-                    'نونهالان',
-                  ].map((type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(type),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      typeController.text = newValue!;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "رده سنی",
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                TextField(
-                  controller: feeController,
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "فیس",
-                  ),
-                  textAlign: TextAlign.right,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Container(
-                  width: fullScreenWidth,
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.0),
-                    border: Border.all(
-                      color: Colors.grey,
-                      style: BorderStyle.solid,
-                      width: 2.0,
-                    ),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: dropdownValue,
-                      icon: const Icon(Icons.arrow_downward),
-                      iconSize: 24,
-                      elevation: 16,
-                      style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Colors.black87
-                            : Colors.grey,
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValue = newValue!;
-                        });
-                      },
-                      items: <String>['Month', 'Week']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                TextField(
-                  controller: periodController,
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "مدت ثبت نام",
-                  ),
-                  textAlign: TextAlign.right,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                TextField(
-                  controller: debtorController,
-                  decoration: const InputDecoration(
-                    border:
-                        OutlineInputBorder(borderSide: BorderSide(width: 2)),
-                    hintText: "قرض",
-                  ),
-                  textAlign: TextAlign.right,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Container(
-                  height: 60,
-                  decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          width: 1.0,
-                          color: Colors.grey,
-                        ),
-                        left: BorderSide(
-                          width: 1.0,
-                          color: Colors.grey,
-                        ),
-                        right: BorderSide(
-                          width: 1.0,
-                          color: Colors.grey,
-                        ),
-                        bottom: BorderSide(
-                          width: 1.0,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        InkWell(
-                          child: Text(
-                            _selectedDate != null
-                                ? pdp.Jalali.fromDateTime(_selectedDate!)
-                                    .formatFullDate()
-                                : "تاریخ",
-                            textAlign: TextAlign.center,
+      body: Stack(
+        children: [
+          _buildMeshBackground(isDark),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              _buildSliverAppBar(isDark),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        _buildSectionHeader("مشخصات فردی", Icons.sports_soccer, isDark),
+                        _buildGlassCard(isDark, [
+                          _buildTextField(nameController, "نام", Icons.person, isDark),
+                          const SizedBox(height: 16),
+                          _buildTextField(lastController, "تخلص", Icons.badge, isDark),
+                        ]),
+                        const SizedBox(height: 24),
+                        _buildSectionHeader("جزئیات اشتراک", Icons.workspace_premium, isDark),
+                        _buildGlassCard(isDark, [
+                          _buildDropdownField(isDark),
+                          const SizedBox(height: 16),
+                          _buildTextField(feeController, "مبلغ (AFN)", Icons.payments, isDark, isNum: true),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(child: _buildUnitDropdown(isDark)),
+                              const SizedBox(width: 12),
+                              Expanded(flex: 2, child: _buildTextField(periodController, "مدت", Icons.timer, isDark, isNum: true)),
+                            ],
                           ),
-                          onTap: () {
-                            _selectDate(context);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.calendar_today),
-                          tooltip: 'Tap to open date picker',
-                          onPressed: () => _selectDate(context),
-                        ),
+                        ]),
+                        const SizedBox(height: 24),
+                        _buildSectionHeader("تاریخ و وضعیت مالی", Icons.account_balance_wallet, isDark),
+                        _buildGlassCard(isDark, [
+                          _buildTextField(debtorController, "قرض / باقیمانده", Icons.money_off, isDark, isNum: true),
+                          const SizedBox(height: 16),
+                          _buildDatePicker(isDark),
+                        ]),
+                        const SizedBox(height: 40),
+                        _buildSubmitButton(isDark),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
-                SizedBox(
-                  height: 50,
-                  width: fullScreenWidth,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      createRecord();
-                    },
-                    style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                      Color.fromRGBO(255, 180, 0, 1.0),
-                    )),
-                    child: const Text(
-                      "ذخیره",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontFamily: "TrajanPro",
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMeshBackground(bool isDark) {
+    return Positioned.fill(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark 
+              ? [const Color(0xFF1E293B), const Color(0xFF020617), const Color(0xFF0F172A)]
+              : [Colors.white, const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
           ),
         ),
       ),
     );
   }
 
-  void createRecord() async {
-    final persianDate = pdp.Jalali.fromDateTime(_selectedDate!);
-    int proid = int.parse(periodController.text);
-    proid = dropdownValue == 'Week' ? proid * 7 : proid * 30;
-    DateTime? endDate = _selectedDate?.add(Duration(days: proid));
-    final persianEndDate = pdp.Jalali.fromDateTime(endDate!);
+  Widget _buildSliverAppBar(bool isDark) {
+    return SliverAppBar(
+      // expandedHeight: 120.0,
+      floating: false,
+      pinned: true,
+      backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        title: Text(
+          "ثبت نام ورزشکار",
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+          ),
+        ),
+      ),
+    );
+  }
 
-    int debtNum = int.tryParse(debtorController.text) ??
-        0; // Ensure debt is parsed as int
+  Widget _buildSectionHeader(String title, IconData icon, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12, right: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(title, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 8),
+          Icon(icon, color: Colors.blueAccent, size: 20),
+        ],
+      ),
+    );
+  }
 
-    if (debtNum == 0 || debtorController.text.isEmpty) {
-      try {
-        CollectionReference collRef =
-            FirebaseFirestore.instance.collection('players');
-        await collRef.add({
-          'Name': nameController.text,
-          'Last Name': lastController.text,
-          'Type': typeController.text,
-          'Fee': feeController.text,
-          'Period': periodController.text,
-          'Debt': debtNum, // Store debt as an integer
-          'Date': {
-            'year': persianDate.year,
-            'month': persianDate.month,
-            'day': persianDate.day,
-          },
-          'End Date': {
-            'year': persianEndDate.year,
-            'month': persianEndDate.month,
-            'day': persianEndDate.day,
-          },
-        }).then((value) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successful inserted'),
+  Widget _buildGlassCard(bool isDark, List<Widget> children) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white.withValues(alpha: .8),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.white),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha:isDark ? 0.3 : 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          )
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, bool isDark, {bool isNum = false}) {
+    return TextFormField(
+      controller: controller,
+      textAlign: TextAlign.right,
+      keyboardType: isNum ? TextInputType.number : TextInputType.text,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.black45),
+        prefixIcon: Icon(icon, color: Colors.blueAccent),
+        filled: true,
+        fillColor: isDark ? Colors.black26 : Colors.grey[100],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.blueAccent, width: 1)),
+      ),
+      validator: (v) => v!.isEmpty ? "الزامی" : null,
+    );
+  }
+
+  Widget _buildDropdownField(bool isDark) {
+    return DropdownButtonFormField<String>(
+      dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: InputDecoration(
+        labelText: "تایم تمرینی",
+        prefixIcon: const Icon(Icons.fitness_center, color: Colors.blueAccent),
+        filled: true,
+        fillColor: isDark ? Colors.black26 : Colors.grey[100],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+      ),
+      items: ['صبح', 'بعد از ظهر', 'VIP', 'نوجوانان'].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+      onChanged: (val) => typeController.text = val!,
+    );
+  }
+
+  Widget _buildUnitDropdown(bool isDark) {
+    return DropdownButtonFormField<String>(
+      value: dropdownValue,
+      dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: isDark ? Colors.black26 : Colors.grey[100],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+      ),
+      items: ['Month', 'Week'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+      onChanged: (v) => setState(() => dropdownValue = v!),
+    );
+  }
+
+  Widget _buildDatePicker(bool isDark) {
+    return InkWell(
+      onTap: () => _selectDate(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.black26 : Colors.grey[100],
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Icon(Icons.calendar_today, color: Colors.blueAccent),
+            Text(
+              _selectedDate != null 
+                  ? pdp.Jalali.fromDateTime(_selectedDate!).formatFullDate() 
+                  : "تاریخ شروع قرارداد",
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
             ),
-          );
-        }).catchError((error) {
-          // print("Failed to add user: $error");
-        });
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to add user'),
-          ),
-        );
-      }
-    } else if (debtorController.text.isNotEmpty) {
-      try {
-        CollectionReference collRef =
-            FirebaseFirestore.instance.collection('players');
-        await collRef.add({
-          'Name': nameController.text,
-          'Last Name': lastController.text,
-          'Type': typeController.text,
-          'Fee': feeController.text,
-          'Period': periodController.text,
-          'Debt': debtNum, // Store debt as an integer
-          'Date': {
-            'year': persianDate.year,
-            'month': persianDate.month,
-            'day': persianDate.day,
-          },
-          'End Date': {
-            'year': persianEndDate.year,
-            'month': persianEndDate.month,
-            'day': persianEndDate.day,
-          },
-        }).then((value) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successful inserted'),
-            ),
-          );
-        }).catchError((error) {
-          // print("Failed to add user: $error");
-        });
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to add user'),
-          ),
-        );
-      }
-      try {
-        CollectionReference collRef =
-            FirebaseFirestore.instance.collection('Debtors');
-        await collRef
-            .add({
-              'Name': nameController.text,
-              'Last Name': lastController.text,
-              'Debt': debtNum,
-            })
-            .then((value) {})
-            .catchError((error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Failed to add user"),
-                ),
-              );
-            });
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to add user'),
-          ),
-        );
-      }
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton(bool isDark) {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueAccent.withValues(alpha: .3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          )
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _saveData,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blueAccent,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 0,
+        ),
+        child: _isLoading 
+            ? const CircularProgressIndicator(color: Colors.white) 
+            : const Text("ثبت و تایید نهایی", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  // --- Logic Layer ---
+  Future<void> _saveData() async {
+    if (!_formKey.currentState!.validate() || _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("لطفا تمامی فیلدها را پر کنید")));
+      return;
     }
+    setState(() => _isLoading = true);
+    try {
+      final int period = int.parse(periodController.text);
+      final int days = dropdownValue == 'Week' ? period * 7 : period * 30;
+      final DateTime endDate = _selectedDate!.add(Duration(days: days));
+      final int debt = int.tryParse(debtorController.text) ?? 0;
 
+      final pdp.Jalali pStart = pdp.Jalali.fromDateTime(_selectedDate!);
+      final pdp.Jalali pEnd = pdp.Jalali.fromDateTime(endDate);
+
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      DocumentReference playerRef = FirebaseFirestore.instance.collection('players').doc();
+
+      batch.set(playerRef, {
+        'Name': nameController.text,
+        'Last Name': lastController.text,
+        'Type': typeController.text,
+        'Fee': feeController.text,
+        'Debt': debt,
+        'StartDate': {'y': pStart.year, 'm': pStart.month, 'd': pStart.day},
+        'EndDate': {'y': pEnd.year, 'm': pEnd.month, 'd': pEnd.day},
+        'Timestamp': FieldValue.serverTimestamp(),
+      });
+
+      if (debt > 0) {
+        DocumentReference debtRef = FirebaseFirestore.instance.collection('Debtors').doc();
+        batch.set(debtRef, {
+          'Name': nameController.text,
+          'Last Name': lastController.text,
+          'Debt': debt,
+          'PlayerID': playerRef.id,
+        });
+      }
+
+      await batch.commit();
+      _clearForm();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("ثبت نام با موفقیت انجام شد")));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("خطا: $e")));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _clearForm() {
     nameController.clear();
     lastController.clear();
     feeController.clear();
-    periodController.clear();
-    debtorController.clear();
+    debtorController.text = "0";
+    setState(() => _selectedDate = null);
   }
 }
