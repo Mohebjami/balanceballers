@@ -116,9 +116,9 @@ class _PlayerListState extends State<PlayerList> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: isDark
-                ? [Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF020617)]
-                : [Colors.white, Color(0xFFE2E8F0), Color(0xFFF1F5F9)],
+            colors: isDark 
+              ? [const Color(0xFF1E293B), const Color(0xFF020617), const Color(0xFF0F172A)]
+              : [Colors.white, const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
           ),
         ),
       ),
