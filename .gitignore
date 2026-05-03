@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+node_modules/
+ios/build/
+macos/Pods/
 
 # Symbolication related
 app.*.symbols

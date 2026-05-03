@@ -1,9 +1,9 @@
-import 'package:balanceballers/Register.dart';
-import 'package:balanceballers/firebase_options.dart';
+import 'package:balanceballers/views/register/register_screen.dart';
+import 'package:balanceballers/core/config/firebase_options.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:balanceballers/Start.dart';
+import 'package:balanceballers/views/start/start_screen.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
